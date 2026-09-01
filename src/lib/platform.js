@@ -1,15 +1,20 @@
+import { Capacitor } from '@capacitor/core';
 import { createClient } from '@supabase/supabase-js';
 import { WEBSITE_BASE } from '../config.js';
 
 export const SUPABASE_URL = 'https://uwcqvsitjtknxsaypjxj.supabase.co';
 export const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_qsC-udp3YoJQFuE-lHPivg_wa8gYMeg';
 export const EMERGENCY_ENDPOINT = `${SUPABASE_URL}/functions/v1/emergency-response`;
+export const NATIVE_AUTH_REDIRECT = 'masinlocconnect://auth/callback';
+
+const isNativePlatform = Capacitor.isNativePlatform();
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
-    detectSessionInUrl: true,
+    detectSessionInUrl: !isNativePlatform,
+    flowType: 'pkce',
   },
 });
 
@@ -65,12 +70,38 @@ export async function getJobProviders() {
 export async function sendEmailSignIn(email) {
   const cleanEmail = String(email || '').trim().toLowerCase();
   if (!cleanEmail) throw new Error('Enter your email address.');
-  const redirectTo = import.meta.env.VITE_AUTH_REDIRECT_URL || window.location.href.split('#')[0];
+  const redirectTo = isNativePlatform
+    ? NATIVE_AUTH_REDIRECT
+    : (import.meta.env.VITE_AUTH_REDIRECT_URL || window.location.href.split('#')[0]);
   const { error } = await supabase.auth.signInWithOtp({
     email: cleanEmail,
     options: { emailRedirectTo: redirectTo },
   });
   if (error) throw error;
+}
+
+export async function handleAuthCallback(url) {
+  if (!url) return null;
+  const parsed = new URL(url);
+  const errorDescription = parsed.searchParams.get('error_description') || parsed.searchParams.get('error');
+  if (errorDescription) throw new Error(errorDescription);
+
+  const code = parsed.searchParams.get('code');
+  if (code) {
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+    if (error) throw error;
+    return data.session || null;
+  }
+
+  const hash = new URLSearchParams(parsed.hash.replace(/^#/, ''));
+  const accessToken = hash.get('access_token');
+  const refreshToken = hash.get('refresh_token');
+  if (accessToken && refreshToken) {
+    const { data, error } = await supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+    if (error) throw error;
+    return data.session || null;
+  }
+  return null;
 }
 
 export async function signOut() {

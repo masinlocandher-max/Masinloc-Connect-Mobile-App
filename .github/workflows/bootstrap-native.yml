@@ -1,0 +1,68 @@
+name: Bootstrap Native Platforms
+
+on:
+  push:
+    branches:
+      - agent/native-release-candidate
+    paths-ignore:
+      - 'android/**'
+      - 'ios/**'
+      - 'package-lock.json'
+
+permissions:
+  contents: write
+
+jobs:
+  generate-native-projects:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout release branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/native-release-candidate
+          fetch-depth: 0
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build web bundle
+        run: npm run build
+
+      - name: Generate Android project
+        if: ${{ hashFiles('android/app/build.gradle') == '' }}
+        run: npx cap add android
+
+      - name: Generate iOS project
+        if: ${{ hashFiles('ios/App/App.xcodeproj/project.pbxproj') == '' }}
+        run: npx cap add ios
+
+      - name: Sync Capacitor plugins
+        run: npx cap sync
+
+      - name: Apply native app configuration
+        run: npm run native:configure
+
+      - name: Generate native icons and splash screens
+        run: npm run native:assets
+
+      - name: Verify native release contract
+        run: npm run native:verify
+
+      - name: Commit generated native projects
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json android ios public assets
+          if git diff --cached --quiet; then
+            echo "Native projects already current."
+            exit 0
+          fi
+          git commit -m "Generate Capacitor iOS and Android projects"
+          git push origin HEAD:agent/native-release-candidate

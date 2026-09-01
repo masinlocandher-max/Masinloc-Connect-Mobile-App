@@ -1,0 +1,65 @@
+name: Store Screenshot QA
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/native-release-candidate
+    paths:
+      - '.github/workflows/store-screenshot-qa.yml'
+      - 'scripts/capture-store-screenshots.mjs'
+
+permissions:
+  contents: write
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout release branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/native-release-candidate
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install app dependencies
+        run: npm ci
+
+      - name: Install screenshot browser
+        run: |
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Build release web bundle
+        run: npm run build
+
+      - name: Start release preview
+        run: |
+          nohup npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/masinloc-preview.log 2>&1 &
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4173 >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/masinloc-preview.log
+          exit 1
+
+      - name: Capture iOS and Android store screenshots
+        run: node scripts/capture-store-screenshots.mjs
+
+      - name: Commit verified screenshots
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add store/screenshots
+          if git diff --cached --quiet; then
+            echo "Screenshot set already current."
+            exit 0
+          fi
+          git commit -m "Add verified native store screenshots"
+          git push origin HEAD:agent/native-release-candidate

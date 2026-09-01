@@ -1,18 +1,29 @@
 {
   "name": "masinloc-connect-mobile-app",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "cap:sync": "npm run build && cap sync",
+    "cap:add": "cap add ios && cap add android",
     "cap:ios": "npm run build && cap sync ios && cap open ios",
-    "cap:android": "npm run build && cap sync android && cap open android"
+    "cap:android": "npm run build && cap sync android && cap open android",
+    "native:configure": "node scripts/configure-native.mjs",
+    "native:assets": "capacitor-assets generate --iconBackgroundColor '#061A46' --iconBackgroundColorDark '#061A46' --splashBackgroundColor '#061A46' --splashBackgroundColorDark '#061A46'",
+    "native:verify": "node scripts/verify-native.mjs"
   },
   "dependencies": {
+    "@capacitor/app": "^8.0.0",
+    "@capacitor/browser": "^8.0.0",
     "@capacitor/core": "^8.5.0",
+    "@capacitor/geolocation": "^8.0.0",
+    "@capacitor/network": "^8.0.0",
+    "@capacitor/push-notifications": "^8.0.0",
+    "@capacitor/splash-screen": "^8.0.0",
+    "@capacitor/status-bar": "^8.0.0",
     "@supabase/supabase-js": "^2.57.4",
     "lucide-react": "^1.37.0",
     "react": "^19.2.8",
@@ -20,6 +31,7 @@
   },
   "devDependencies": {
     "@capacitor/android": "^8.5.0",
+    "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^8.5.0",
     "@capacitor/ios": "^8.5.0",
     "@vitejs/plugin-react": "^6.1.1",
