@@ -1,4 +1,4 @@
-import { SUPABASE_URL, supabase } from './platform.js';
+import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL, supabase } from './platform.js';
 
 export async function requestAccountDeletion() {
   const { data, error: sessionError } = await supabase.auth.getSession();
@@ -10,7 +10,7 @@ export async function requestAccountDeletion() {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${session.access_token}`,
-      apikey: session.access_token,
+      apikey: SUPABASE_PUBLISHABLE_KEY,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ confirm: true }),
