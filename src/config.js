@@ -4,7 +4,7 @@ export const routes = {
   website: `${WEBSITE_BASE}/`,
   discover: `${WEBSITE_BASE}/discover/`,
   marketplace: `${WEBSITE_BASE}/marketplace.html`,
-  mabayani: `${WEBSITE_BASE}/mabayani.html`,
+  mabayani: `${WEBSITE_BASE}/verified-history.html`,
   dictionary: `${WEBSITE_BASE}/sambal-tina.html`,
   helpDesk: `${WEBSITE_BASE}/emergency/`,
   connect: `${WEBSITE_BASE}/connect.html`,
