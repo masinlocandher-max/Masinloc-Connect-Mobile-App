@@ -226,7 +226,7 @@ export async function saveSignatureResume(user, form) {
       user_id: user.id,
       name: form.name.trim() || 'Signature Resume',
       target_role: form.target_role.trim() || null,
-      template_code: 'signature-v1',
+      template_code: 'signature_v1',
       resume_snapshot: snapshot,
       is_primary: true,
     })
