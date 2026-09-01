@@ -1,0 +1,17 @@
+{
+  "name": "Masinloc Connect",
+  "short_name": "Masinloc Connect",
+  "description": "Connecting Masinloqueños to the World.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#03112F",
+  "icons": [
+    {
+      "src": "https://www.masinloc-zambales.com/assets/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
