@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   AlertTriangle,
   ArrowLeft,
-  Bell,
   BookOpen,
   BriefcaseBusiness,
   Building2,
@@ -31,6 +30,7 @@ import {
   X,
 } from 'lucide-react';
 import { assets, MASINLOC_CENTER, routes, WEATHER_ENDPOINT, WEBSITE_BASE } from './config.js';
+import { requestAccountDeletion } from './lib/account.js';
 import {
   getCareerProfile,
   getEmergencyStatus,
@@ -316,9 +316,6 @@ function AppTopBar({ view, user, accountLoading, onBack, onProfile }) {
         </button>
       )}
       <div className="topbar-actions">
-        <button className="icon-button" type="button" aria-label="Notifications" disabled title="Notification delivery will activate after native push setup">
-          <Bell size={20} strokeWidth={1.9} />
-        </button>
         <button className="avatar-button" type="button" onClick={onProfile} aria-label={user ? 'Open profile' : 'Sign in'}>
           {accountLoading ? <LoaderCircle className="spin" size={23} /> : <CircleUserRound size={25} strokeWidth={1.75} />}
         </button>
@@ -872,6 +869,7 @@ function DiscoverScreen() {
 function ProfileScreen({ user, memberProfile, onProfileSaved, navigate }) {
   const [form, setForm] = useState({ display_name: memberProfile?.display_name || '', current_location: memberProfile?.current_location || '' });
   const [state, setState] = useState('idle');
+  const [deleteState, setDeleteState] = useState('idle');
   if (!user) return <EmptyState icon={UserRound} title="Sign in to open your profile" body="Registration is only required for saved and personalized features." />;
 
   const save = async (event) => {
@@ -884,12 +882,31 @@ function ProfileScreen({ user, memberProfile, onProfileSaved, navigate }) {
     } catch { setState('error'); }
   };
 
+  const deleteAccount = async () => {
+    const confirmed = window.confirm('Delete your Masinloc Connect account? Your profile, saved items, saved jobs and resume data will be removed. This cannot be undone.');
+    if (!confirmed) return;
+    setDeleteState('deleting');
+    try {
+      await requestAccountDeletion();
+      setDeleteState('deleted');
+      navigate('home');
+    } catch (error) {
+      setDeleteState('error');
+    }
+  };
+
   return (
     <div className="screen-stack profile-screen">
       <ScreenTitle title="My Profile" subtitle={user.email} />
       <form className="profile-form" onSubmit={save}><label>Name<input value={form.display_name} onChange={(event) => setForm({ ...form, display_name: event.target.value })} placeholder="How should Masinloc Connect greet you?" /></label><label>Location / Barangay<input value={form.current_location} onChange={(event) => setForm({ ...form, current_location: event.target.value })} placeholder="Optional" /></label><button className="primary-button full" disabled={state === 'saving'} type="submit">{state === 'saving' ? 'Saving…' : state === 'saved' ? 'Saved' : 'Save profile'}</button>{state === 'error' ? <p className="form-error">Could not save your profile right now.</p> : null}</form>
       <div className="utility-list"><button type="button" onClick={() => navigate('resume')}><FileText size={21} /><div><strong>Signature Resume</strong><span>Your reusable career profile.</span></div><ChevronRight size={19} /></button></div>
       <button className="secondary-button full" type="button" onClick={() => signOut()}>Sign out</button>
+      <section className="account-danger-zone" aria-labelledby="delete-account-title">
+        <h2 id="delete-account-title">Delete account</h2>
+        <p>Deletes your account, profile, saved items, saved jobs and resume data. Emergency reports and required transaction or audit records may be retained where needed for safety or recordkeeping without an active account.</p>
+        {deleteState === 'error' ? <p className="form-error">Could not delete your account right now. Please try again.</p> : null}
+        <button className="secondary-button full" type="button" disabled={deleteState === 'deleting'} onClick={deleteAccount}>{deleteState === 'deleting' ? 'Deleting account…' : 'Delete account'}</button>
+      </section>
     </div>
   );
 }
