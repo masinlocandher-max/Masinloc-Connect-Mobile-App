@@ -90,16 +90,22 @@ export async function getMemberProfile(userId) {
 }
 
 export async function saveMemberProfile(userId, patch) {
-  const payload = {
-    user_id: userId,
+  const changes = {
     display_name: patch.display_name?.trim() || null,
     current_location: patch.current_location?.trim() || null,
-    onboarding_status: 'active',
     updated_at: new Date().toISOString(),
   };
-  const { data, error } = await supabase
+  const { data: existing, error: readError } = await supabase
     .from('member_profiles')
-    .upsert(payload, { onConflict: 'user_id' })
+    .select('user_id')
+    .eq('user_id', userId)
+    .maybeSingle();
+  if (readError) throw readError;
+
+  const query = existing
+    ? supabase.from('member_profiles').update(changes).eq('user_id', userId)
+    : supabase.from('member_profiles').insert({ user_id: userId, ...changes });
+  const { data, error } = await query
     .select('user_id,display_name,current_location,onboarding_status')
     .single();
   if (error) throw error;
