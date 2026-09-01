@@ -2,6 +2,12 @@ name: Store Screenshot QA
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - agent/native-release-candidate
+    paths:
+      - '.github/workflows/store-screenshot-qa.yml'
+      - 'scripts/capture-store-screenshots.mjs'
 
 permissions:
   contents: write
