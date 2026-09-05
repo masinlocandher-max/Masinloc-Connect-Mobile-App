@@ -1,15 +1,15 @@
 import {
-  BellRing, BookOpen, Box, BriefcaseBusiness, Building2, CircleUserRound,
-  Compass, HelpCircle, Home, Info, Mail, MapPin, Menu, Settings, Shield,
-  ShoppingCart, Store, Truck, UserRound,
+  Bell, BellRing, BookOpen, Box, BriefcaseBusiness, Building2, CircleUserRound,
+  Compass, HelpCircle, Home, Info, Mail, MapPin, Settings, Shield,
+  ShoppingCart, Store, Truck, UserRound, Bookmark,
 } from 'lucide-react';
 
 export const bottomNav = [
   { id: 'home', label: 'Home', icon: Home },
-  { id: 'marketplace', label: 'Marketplace', icon: ShoppingCart },
-  { id: 'jobs', label: 'Jobs', icon: BriefcaseBusiness },
-  { id: 'report', label: 'Help Desk', icon: HelpCircle },
-  { id: 'more', label: 'More', icon: Menu },
+  { id: 'notifications', label: 'Notifications', icon: Bell },
+  { id: 'profile', label: 'Profile', icon: CircleUserRound, brand: true },
+  { id: 'discover', label: 'Discover', icon: Compass },
+  { id: 'saved', label: 'Saved', icon: Bookmark },
 ];
 
 export const mainMenuItems = [
@@ -31,13 +31,13 @@ export const mainMenuItems = [
 
 export const moreItems = [
   { id: 'discover', label: 'Discover Masinloc', icon: MapPin, tone: 'purple' },
-  { id: 'sellers', label: 'For Sellers', icon: Store, tone: 'gold' },
   { id: 'dictionary', label: 'Sambal Tina', icon: BookOpen, tone: 'orange' },
-  { id: 'bulletin', label: 'Community Bulletin', icon: BellRing, tone: 'violet' },
   { id: 'history', label: 'Masinloc History', icon: Building2, tone: 'teal' },
+  { id: 'bulletin', label: 'Community Bulletin', icon: BellRing, tone: 'violet' },
+  { id: 'sellers', label: 'For Sellers', icon: Store, tone: 'gold' },
   { id: 'profile', label: 'Account Settings', icon: CircleUserRound, tone: 'royal' },
   { id: 'orders', label: 'My Orders', icon: ShoppingCart, tone: 'red' },
-  { id: 'about', label: 'About Masinloc Connect', icon: Info, tone: 'lavender' },
   { id: 'tracking', label: 'Order Status / Tracking', icon: Truck, tone: 'cyan' },
+  { id: 'about', label: 'About Masinloc Connect', icon: Info, tone: 'lavender' },
   { id: 'policies', label: 'Privacy, Terms & Policies', icon: Settings, tone: 'slate' },
 ];

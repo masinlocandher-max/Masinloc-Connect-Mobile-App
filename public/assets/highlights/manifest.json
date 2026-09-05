@@ -1,0 +1,28 @@
+{
+  "assetPolicy": {
+    "hdOrigin": "Google Drive / Highlight Images",
+    "sourceFolderId": "1X5BXdHYzMfzGi-nBa6-Nb312UVRJRe_L",
+    "canonicalPublicationLayer": "masinlocandher-max/Masinloc-Website",
+    "mobileRuntime": "Masinloc Connect consumes optimized website derivatives and does not duplicate HD originals."
+  },
+  "driveSources": [
+    {"driveFileId":"13LClz3Jwu9Ixn3fa0SyTcxu5u6x5G7Q5","original":"841DD78B-2DB4-4184-9220-E92C746CA3FD.png"},
+    {"driveFileId":"1qtPnJQPgrBniJGoiue2w0EUUa9_YDEH-","original":"BE5B5014-0F5A-4A81-93BA-08A9B690681A.png"},
+    {"driveFileId":"1_EF6K1Zs0TCjbvARYdrrUVaLkxvWcHuj","original":"32FB1D9E-23A6-4AF5-A730-49B843DDD671.png"},
+    {"driveFileId":"1BPA01jINVMifVAuQ0P5UYamDKhrDkOag","original":"D18D1651-5C13-4E26-90C3-863E3549FE2F.png"},
+    {"driveFileId":"1DE-ge_SYYGbCan3bl2esF9n7w4RTtoJw","original":"940D71A1-14B0-467A-B847-3237973DED68.png"},
+    {"driveFileId":"1TDwk0t7-8hGhBs8JSSUVSVYx96q3hoLv","original":"159B6390-3E2E-4E23-9D23-B87D5E153155.png"},
+    {"driveFileId":"17SKYc2rMk-HtV_qOPkIifQaWI4-9WEqx","original":"8EA195F1-E6EB-416B-B886-55104D2EB5F3.png"},
+    {"driveFileId":"1Jpq3CphjNsOlfxgmGHgnE1aOBSyQ204t","original":"IMG_9138.JPG"}
+  ],
+  "runtimeRotation": [
+    {"name":"San Andres Church","asset":"/assets/locations/san-andres-church-card-1200.webp"},
+    {"name":"Bacala Sandbar","asset":"/assets/locations/bacala-sandbar-guesthouse-1120.webp"},
+    {"name":"Coto Kidz Pool","asset":"/assets/locations/coto-kidz-pool-1120.webp"},
+    {"name":"Hamat River","asset":"/assets/locations/hamat-river-1120.webp"},
+    {"name":"Masinloc Baywalk","asset":"/assets/locations/masinloc-baywalk-1120.webp"},
+    {"name":"Sitio Buri","asset":"/assets/locations/sitio-buri-1120.webp"},
+    {"name":"Bunga Cave","asset":"/assets/locations/bunga-cave-1120.webp"},
+    {"name":"San Salvador Island","asset":"/assets/locations/san-salvador-island-1120.webp"}
+  ]
+}

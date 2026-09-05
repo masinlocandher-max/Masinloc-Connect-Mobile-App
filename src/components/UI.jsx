@@ -16,9 +16,10 @@ export function ScreenTopBar({ onBack, onHome }) {
 }
 
 export function BottomNav({ active, onNavigate }) {
-  return <nav className="bottom-nav" aria-label="Primary navigation">{bottomNav.map(({ id, label, icon: Icon }) =>
-    <button key={id} type="button" className={active === id ? 'active' : ''} aria-current={active === id ? 'page' : undefined} onClick={() => onNavigate(id)}>
-      <Icon size={22} strokeWidth={active === id ? 2.25 : 1.8} /><span>{label}</span>
+  return <nav className="bottom-nav bottom-nav-v2" aria-label="Primary navigation">{bottomNav.map(({ id, label, icon: Icon, brand }) =>
+    <button key={id} type="button" className={`${active === id ? 'active' : ''}${brand ? ' brand-tab' : ''}`} aria-current={active === id ? 'page' : undefined} onClick={() => onNavigate(id)}>
+      {brand ? <span className="bottom-brand-mark"><img src="/assets/masinloc-connect-logo.webp" alt="" /></span> : <Icon size={23} strokeWidth={active === id ? 2.45 : 1.9} />}
+      <span>{label}</span>
     </button>)}</nav>;
 }
 
