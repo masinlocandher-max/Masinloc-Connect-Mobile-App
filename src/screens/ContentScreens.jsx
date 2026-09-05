@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react';
-import { BookOpen, ChevronRight, ExternalLink, Search } from 'lucide-react';
+import { useState } from 'react';
+import { ChevronRight, ExternalLink } from 'lucide-react';
 import { routes } from '../config.js';
 import useCanonicalData from '../hooks/useCanonicalData.js';
-import { AsyncState, EmptyState, ScreenTitle, SearchField, formatDate } from '../components/UI.jsx';
+import { AsyncState, ScreenTitle, formatDate } from '../components/UI.jsx';
+import DictionaryShowcase from './DictionaryShowcase.jsx';
 
 export function BulletinScreen() {
   const source = useCanonicalData('bulletin');
@@ -29,22 +30,8 @@ export function DiscoverScreen() {
   </div>;
 }
 
-export function DictionaryScreen() {
-  const source = useCanonicalData('dictionary');
-  const [query, setQuery] = useState('');
-  const entries = useMemo(() => {
-    if (!source.data?.entries) return [];
-    const columns = source.data.columns || ['tina', 'pos', 'en', 'fil', 'pages'];
-    return source.data.entries.map((entry) => Object.fromEntries(columns.map((column, index) => [column, entry[index]])));
-  }, [source.data]);
-  const matches = useMemo(() => {
-    const needle = query.trim().toLowerCase();
-    return (needle ? entries.filter((entry) => `${entry.tina} ${entry.en || ''} ${entry.fil || ''}`.toLowerCase().includes(needle)) : entries).slice(0, 80);
-  }, [entries, query]);
-  return <div className="screen-stack"><ScreenTitle title="Sambal Tina" subtitle="Search the same source-supported dictionary published by Masinloc Connect." /><SearchField value={query} onChange={setQuery} placeholder="Search Sambal Tina, English or Filipino" />
-    <AsyncState state={source} label="Sambal Tina Dictionary" />
-    {source.status === 'ready' ? matches.length ? <div className="dictionary-list">{matches.map((entry, index) => <article className="dictionary-entry" key={`${entry.tina}-${index}`}><span>{entry.pos || 'entry'}</span><h2>{entry.tina}</h2><p><strong>English:</strong> {entry.en || '—'}</p>{entry.fil ? <p><strong>Filipino:</strong> {entry.fil}</p> : null}{entry.pages ? <small>Source page: {entry.pages}</small> : null}</article>)}</div> : <EmptyState icon={Search} title="No matching word" body="Try another spelling or search in English or Filipino." /> : null}
-  </div>;
+export function DictionaryScreen({ navigate }) {
+  return <DictionaryShowcase navigate={navigate} />;
 }
 
 export function HistoryScreen() {
