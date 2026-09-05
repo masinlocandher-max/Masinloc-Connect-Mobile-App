@@ -6,6 +6,7 @@ import { EmptyState } from '../components/UI.jsx';
 const categories = ['All', 'Jobs', 'Scholarships', 'Training', 'Internships'];
 const locations = ['Masinloc', 'Nearby', 'Remote'];
 const workTypes = ['Full-time', 'Part-time', 'Contract'];
+const APPLICATIONS_KEY = 'masinloc-connect-applications-v1';
 
 function kindOf(job) {
   const text = `${job.title || ''} ${job.employment_type || ''}`.toLowerCase();
@@ -20,6 +21,16 @@ function posted(value) {
   const days = Math.max(0, Math.floor((Date.now() - new Date(value).getTime()) / 86400000));
   if (!days) return 'Posted today';
   return `Posted ${days} day${days === 1 ? '' : 's'} ago`;
+}
+
+function trackOpened(job) {
+  try {
+    const current = JSON.parse(localStorage.getItem(APPLICATIONS_KEY) || '[]');
+    const existing = current.find((item) => item.job_id === job.id);
+    const nextItem = { id: existing?.id || crypto.randomUUID(), job_id: job.id, title: job.title, company: job.company, status: 'Opened externally', opened_at: new Date().toISOString(), apply_url: job.apply_url };
+    const next = [nextItem, ...current.filter((item) => item.job_id !== job.id)];
+    localStorage.setItem(APPLICATIONS_KEY, JSON.stringify(next));
+  } catch { /* local tracker is best-effort only */ }
 }
 
 export default function JobsShowcase({ user, requireAccount, navigate }) {
@@ -61,6 +72,11 @@ export default function JobsShowcase({ user, requireAccount, navigate }) {
     setSaved((items) => next ? [{ external_job_id: id, created_at: new Date().toISOString() }, ...items] : items.filter((item) => item.external_job_id !== id));
   };
 
+  const openOpportunity = (job) => {
+    trackOpened(job);
+    window.open(job.apply_url, '_blank', 'noopener,noreferrer');
+  };
+
   return <div className="jobs-showcase">
     <section className="showcase-hero jobs-hero">
       <div className="showcase-hero-photo" aria-hidden="true" />
@@ -85,8 +101,8 @@ export default function JobsShowcase({ user, requireAccount, navigate }) {
       </div>
 
       <div className="career-tools">
-        <article className="career-tool-card"><span className="career-tool-icon"><FileText size={23} /></span><div><strong>Signature Resume</strong><p>Create and manage your Masinloc Connect resume.</p></div></article>
-        <article className="career-tool-card"><span className="career-tool-icon alt"><BriefcaseBusiness size={23} /></span><div><strong>My Applications</strong><p>Track your job and opportunity applications.</p></div></article>
+        <button className="career-tool-card" type="button" onClick={() => navigate('resume')}><span className="career-tool-icon"><FileText size={23} /></span><div><strong>Signature Resume</strong><p>Create and manage your Masinloc Connect resume.</p></div><ChevronRight size={17}/></button>
+        <button className="career-tool-card" type="button" onClick={() => navigate('applications')}><span className="career-tool-icon alt"><BriefcaseBusiness size={23} /></span><div><strong>My Applications</strong><p>Track opportunities you opened from the app.</p></div><ChevronRight size={17}/></button>
       </div>
 
       <div className="jobs-section-heading"><h2>Latest Opportunities</h2><button type="button" onClick={() => { setCategory('All'); setLocation(''); setWorkType(''); }}>See all <ChevronRight size={15} /></button></div>
@@ -100,7 +116,7 @@ export default function JobsShowcase({ user, requireAccount, navigate }) {
           <div className="showcase-job-meta">{job.location ? <span><MapPin size={14} />{job.location}</span> : null}{job.employment_type ? <span><BriefcaseBusiness size={14} />{job.employment_type}</span> : null}</div>
           {job.salary_text ? <p className="showcase-job-pay">{job.salary_text}</p> : null}
           <div className="showcase-job-dates">{job.published_at ? <span>{posted(job.published_at)}</span> : null}{job.closing_date ? <span>Apply by {new Date(job.closing_date).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' })}</span> : null}</div>
-          <div className="showcase-job-footer"><small><Check size={13} />{provider?.attribution_label || provider?.name || 'Trusted Job Provider'}</small><button type="button" onClick={() => window.open(job.apply_url, '_blank', 'noopener,noreferrer')}>{kindOf(job) === 'Jobs' ? 'View Job' : 'View Details'} <ExternalLink size={14} /></button></div>
+          <div className="showcase-job-footer"><small><Check size={13} />{provider?.attribution_label || provider?.name || 'Trusted Job Provider'}</small><button type="button" onClick={() => openOpportunity(job)}>{kindOf(job) === 'Jobs' ? 'View Job' : 'View Details'} <ExternalLink size={14} /></button></div>
         </article>;
       })}</div> : <EmptyState icon={Search} title="No matching opportunities" body="Try another keyword or clear a filter." /> : null}
     </section>
