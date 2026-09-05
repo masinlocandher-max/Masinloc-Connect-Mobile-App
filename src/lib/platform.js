@@ -47,6 +47,8 @@ export async function getLiveJobs() {
   const { data, error } = await supabase
     .from('external_jobs')
     .select('id,provider_id,title,company,location,work_setup,employment_type,salary_text,description_excerpt,requirements_excerpt,published_at,closing_date,apply_url,verification_status')
+    .eq('is_active', true)
+    .in('verification_status', ['verified', 'live'])
     .order('published_at', { ascending: false })
     .limit(80);
   if (error) throw error;
@@ -57,6 +59,7 @@ export async function getJobProviders() {
   const { data, error } = await supabase
     .from('job_providers')
     .select('id,name,attribution_label,homepage_url,public_note,status')
+    .eq('status', 'live')
     .order('name');
   if (error) throw error;
   return data || [];
