@@ -70,7 +70,7 @@ export default function HelpDeskScreen() {
 
   if (active) {
     const copy = statusCopy[active.status] || [active.status || 'Report saved', 'Status updated.'];
-    return <div className="screen-stack"><ScreenTitle title="Your Help Desk Report" subtitle="This report stays on this device even when you are not signed in." />
+    return <div className="screen-stack mobile-native-stack helpdesk-mobile"><ScreenTitle title="Your Help Desk Report" subtitle="This report stays on this device even when you are not signed in." />
       <section className={active.sync_state === 'delivered' ? 'report-status-card delivered' : 'report-status-card offline'}>{active.sync_state === 'delivered' ? <Check size={25} /> : <WifiOff size={25} />}<div><span>{active.reference || 'Pending delivery'}</span><h2>{copy[0]}</h2><p>{copy[1]}</p></div></section>
       <div className="report-facts"><div><span>Agency</span><strong>{active.target_agency?.toUpperCase()}</strong></div><div><span>Incident</span><strong>{active.incident_type?.replaceAll('_',' ')}</strong></div><div><span>Location</span><strong>{active.barangay || active.landmark || (active.latitude ? 'GPS captured' : 'Not available')}</strong></div></div>
       {active.assigned_unit ? <p className="report-assignment"><strong>Assigned unit:</strong> {active.assigned_unit}</p> : null}
@@ -82,7 +82,7 @@ export default function HelpDeskScreen() {
     </div>;
   }
 
-  return <div className="screen-stack"><ScreenTitle title="Help Desk" subtitle="Contact PNP or MDRRMO. An account is never required to report an incident." />
+  return <div className="screen-stack mobile-native-stack helpdesk-mobile"><ScreenTitle title="Help Desk" subtitle="Contact PNP or MDRRMO. An account is never required to report an incident." />
     <a className="emergency-call" href="tel:911"><ShieldAlert size={24} /><div><strong>Life-threatening emergency?</strong><span>Call 911 when you are able.</span></div><ChevronRight size={18} /></a>
     <form className="form-card" onSubmit={submit}><fieldset><legend>Who do you need?</legend><div className="agency-grid">
       <button type="button" className={agency === 'pnp' ? 'selected' : ''} onClick={() => { setAgency('pnp'); setForm((f) => ({...f,incident_type:''})); }}><Shield size={23} /><strong>PNP</strong><span>Police and public safety</span></button>
