@@ -23,6 +23,13 @@ const DATA_FILES = {
   bulletin: 'bulletin.json',
 };
 
+// Production only surfaces providers explicitly promoted to `live` in Supabase.
+// A staging/dev deployment can opt into `testing` providers by setting
+// VITE_JOB_PROVIDER_MODE=testing. Planned/paused providers are never exposed.
+const JOB_PROVIDER_STATUSES = import.meta.env.VITE_JOB_PROVIDER_MODE === 'testing'
+  ? ['live', 'testing']
+  : ['live'];
+
 async function fetchJson(url, signal) {
   const response = await fetch(url, { signal, cache: 'no-store' });
   if (!response.ok) throw new Error(`Request failed (${response.status})`);
@@ -43,24 +50,29 @@ export async function loadCanonicalData(key, signal) {
   }
 }
 
-export async function getLiveJobs() {
-  const { data, error } = await supabase
-    .from('external_jobs')
-    .select('id,provider_id,title,company,location,work_setup,employment_type,salary_text,description_excerpt,requirements_excerpt,published_at,closing_date,apply_url,verification_status')
-    .eq('is_active', true)
-    .in('verification_status', ['verified', 'live'])
-    .order('published_at', { ascending: false })
-    .limit(80);
-  if (error) throw error;
-  return data || [];
-}
-
 export async function getJobProviders() {
   const { data, error } = await supabase
     .from('job_providers')
     .select('id,name,attribution_label,homepage_url,public_note,status')
-    .eq('status', 'live')
+    .in('status', JOB_PROVIDER_STATUSES)
     .order('name');
+  if (error) throw error;
+  return data || [];
+}
+
+export async function getLiveJobs() {
+  const providers = await getJobProviders();
+  const providerIds = providers.map((provider) => provider.id);
+  if (!providerIds.length) return [];
+
+  const { data, error } = await supabase
+    .from('external_jobs')
+    .select('id,provider_id,title,company,location,work_setup,employment_type,salary_text,description_excerpt,requirements_excerpt,published_at,closing_date,apply_url,verification_status')
+    .in('provider_id', providerIds)
+    .eq('is_active', true)
+    .in('verification_status', ['verified', 'live'])
+    .order('published_at', { ascending: false })
+    .limit(80);
   if (error) throw error;
   return data || [];
 }
