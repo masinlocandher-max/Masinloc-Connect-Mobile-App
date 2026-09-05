@@ -1,0 +1,143 @@
+.fruit-avatar {
+  width: var(--avatar-size, 72px);
+  height: var(--avatar-size, 72px);
+  display: inline-block;
+  flex: 0 0 auto;
+  border-radius: 22%;
+  background-image: url('/assets/avatars/fruit-avatars.webp');
+  background-repeat: no-repeat;
+  background-size: 300% 300%;
+  background-color: #eef6ff;
+  box-shadow: 0 5px 16px rgba(19, 68, 145, 0.12);
+}
+
+.profile-avatar-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px;
+  border-radius: 22px;
+  background: linear-gradient(145deg, #f7fbff 0%, #ffffff 68%);
+  border: 1px solid rgba(13, 75, 164, 0.09);
+  box-shadow: 0 10px 30px rgba(13, 75, 164, 0.08);
+}
+
+.profile-avatar-card .fruit-avatar {
+  box-shadow: 0 7px 22px rgba(9, 66, 159, 0.16);
+}
+
+.profile-avatar-copy {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.profile-avatar-copy strong {
+  color: #073777;
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.profile-avatar-copy span {
+  color: #62738c;
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.avatar-picker {
+  margin: 0;
+  padding: 18px;
+  border: 1px solid rgba(13, 75, 164, 0.1);
+  border-radius: 22px;
+  background: #f8fbff;
+}
+
+.avatar-picker legend {
+  padding: 0 5px;
+  color: #073777;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.avatar-picker-help {
+  margin: 0 0 14px;
+  color: #718197;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.avatar-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.avatar-option {
+  position: relative;
+  min-width: 0;
+  padding: 8px 5px 9px;
+  display: grid;
+  justify-items: center;
+  gap: 7px;
+  border: 2px solid transparent;
+  border-radius: 18px;
+  background: #fff;
+  color: #0b3a78;
+  font: inherit;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(25, 68, 129, 0.07);
+  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.avatar-option:active {
+  transform: scale(0.97);
+}
+
+.avatar-option.selected {
+  border-color: #135bc4;
+  box-shadow: 0 7px 20px rgba(18, 86, 193, 0.16);
+}
+
+.avatar-option .fruit-avatar {
+  width: min(86px, 100%);
+  height: auto;
+  aspect-ratio: 1;
+}
+
+.avatar-option-label {
+  max-width: 100%;
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1.15;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.avatar-selected-mark {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border: 3px solid #fff;
+  border-radius: 999px;
+  background: #135bc4;
+  color: #fff;
+  box-shadow: 0 3px 8px rgba(10, 60, 142, 0.24);
+}
+
+@media (max-width: 360px) {
+  .avatar-picker { padding: 14px; }
+  .avatar-picker-grid { gap: 7px; }
+  .avatar-option { padding: 6px 3px 8px; border-radius: 15px; }
+  .avatar-option-label { font-size: 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avatar-option { transition: none; }
+}

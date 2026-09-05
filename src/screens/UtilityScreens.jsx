@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { AlertTriangle, BriefcaseBusiness, Check, CircleUserRound, Compass, ExternalLink, HelpCircle, Mail, PackageCheck, Shield, ShoppingCart, Store } from 'lucide-react';
 import { routes } from '../config.js';
-import { saveMemberProfile, signOut } from '../lib/platform.js';
+import { saveMemberProfile, signOut, supabase } from '../lib/platform.js';
+import { AvatarPicker, DEFAULT_AVATAR_ID, FruitAvatar } from '../avatars.jsx';
 import { Callout, EmptyState, ScreenTitle } from '../components/UI.jsx';
 
 export function SellerScreen() {
@@ -18,19 +19,46 @@ export function OrdersScreen({ mode, user }) {
 }
 
 export function ProfileScreen({ user, profile, onSaved }) {
+  const savedAvatar = user?.user_metadata?.masinloc_avatar || DEFAULT_AVATAR_ID;
   const [form, setForm] = useState({ display_name: profile?.display_name || '', current_location: profile?.current_location || '' });
+  const [avatarId, setAvatarId] = useState(savedAvatar);
   const [status, setStatus] = useState('idle');
-  useEffect(() => setForm({ display_name: profile?.display_name || '', current_location: profile?.current_location || '' }), [profile]);
+
+  useEffect(() => {
+    setForm({ display_name: profile?.display_name || '', current_location: profile?.current_location || '' });
+  }, [profile]);
+
+  useEffect(() => setAvatarId(savedAvatar), [savedAvatar]);
+
   if (!user) return <EmptyState icon={CircleUserRound} title="Account required" body="Continue with Email to open your Masinloc Connect profile." />;
+
   const save = async (event) => {
-    event.preventDefault(); setStatus('saving');
-    try { const saved = await saveMemberProfile(user.id, form); onSaved(saved); setStatus('saved'); } catch { setStatus('error'); }
+    event.preventDefault();
+    setStatus('saving');
+    try {
+      const saved = await saveMemberProfile(user.id, form);
+      const { error } = await supabase.auth.updateUser({ data: { masinloc_avatar: avatarId } });
+      if (error) throw error;
+      onSaved(saved);
+      setStatus('saved');
+    } catch {
+      setStatus('error');
+    }
   };
-  return <div className="screen-stack"><ScreenTitle title="Profile / Account" subtitle={user.email} /><form className="form-card" onSubmit={save}>
-    <label>Name<input value={form.display_name} onChange={(e) => setForm({ ...form, display_name: e.target.value })} placeholder="Your name" /></label>
-    <label>Location / Barangay<input value={form.current_location} onChange={(e) => setForm({ ...form, current_location: e.target.value })} placeholder="Optional" /></label>
-    {status === 'error' ? <div className="form-message"><AlertTriangle size={18} />Could not save your profile.</div> : null}
-    <button className="primary-button full" type="submit" disabled={status === 'saving'}>{status === 'saving' ? 'Saving…' : status === 'saved' ? 'Saved' : 'Save profile'}</button></form>
+
+  return <div className="screen-stack">
+    <ScreenTitle title="Profile / Account" subtitle="Choose how you appear inside Masinloc Connect." />
+    <section className="profile-avatar-card" aria-label="Current profile avatar">
+      <FruitAvatar id={avatarId} size={88} />
+      <div className="profile-avatar-copy"><strong>{form.display_name.trim() || 'Masinloc Connect Member'}</strong><span>{user.email}</span></div>
+    </section>
+    <form className="form-card" onSubmit={save}>
+      <AvatarPicker value={avatarId} onChange={(next) => { setAvatarId(next); setStatus('idle'); }} />
+      <label>Name<input value={form.display_name} onChange={(e) => { setForm({ ...form, display_name: e.target.value }); setStatus('idle'); }} placeholder="Your name" /></label>
+      <label>Location / Barangay<input value={form.current_location} onChange={(e) => { setForm({ ...form, current_location: e.target.value }); setStatus('idle'); }} placeholder="Optional" /></label>
+      {status === 'error' ? <div className="form-message"><AlertTriangle size={18} />Could not save your profile.</div> : null}
+      <button className="primary-button full" type="submit" disabled={status === 'saving'}>{status === 'saving' ? 'Saving…' : status === 'saved' ? 'Saved' : 'Save profile'}</button>
+    </form>
     <button className="secondary-button full" type="button" onClick={() => signOut()}>Sign out</button>
   </div>;
 }
