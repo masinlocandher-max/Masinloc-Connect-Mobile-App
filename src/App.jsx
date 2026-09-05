@@ -39,14 +39,13 @@ export default function App() {
       setSession(nextSession);
       refreshProfile(nextSession?.user);
       const alreadySeen = window.localStorage.getItem(JOIN_SEEN_KEY) === 'yes';
-      setShowJoin(!nextSession && !alreadySeen);
+      setShowJoin(!alreadySeen);
       setSessionReady(true);
     });
     const { data: listener } = supabase.auth.onAuthStateChange((_event, nextSession) => {
       if (!alive) return;
       setSession(nextSession);
       refreshProfile(nextSession?.user);
-      if (nextSession?.user) setShowJoin(true);
     });
     return () => { alive = false; listener.subscription.unsubscribe(); };
   }, [refreshProfile]);
