@@ -1,0 +1,77 @@
+.jobs-screen,.dictionary-screen{padding-bottom:12px}
+
+.jobs-section-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:4px;border:1px solid #dce7f2;border-radius:15px;background:#f5f9fd;overflow:hidden}
+.jobs-section-tabs button{min-width:0;min-height:42px;border:0;border-radius:11px;background:transparent;color:#607891;display:flex;align-items:center;justify-content:center;gap:6px;padding:7px 6px;font-size:.72rem;font-weight:850;cursor:pointer}
+.jobs-section-tabs button.active{background:#fff;color:#0a58bf;box-shadow:0 4px 12px rgba(34,81,128,.1)}
+.jobs-filter-row{margin-top:-2px}
+.jobs-result-summary,.dictionary-result-summary{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 2px;color:#315d8c}
+.jobs-result-summary span,.dictionary-result-summary span{font-size:.76rem;font-weight:850}
+.jobs-result-summary small,.dictionary-result-summary small{font-size:.68rem;color:#7c8fa4;text-align:right}
+
+.job-card-v2{padding:16px}
+.job-badge-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:3px}
+.job-badge-row>span{color:#788ca4;font-size:.67rem;font-weight:850;text-transform:uppercase;letter-spacing:.05em}
+.job-badge-row>b{display:inline-flex;align-items:center;gap:4px;padding:4px 7px;border-radius:999px;background:#edf8f2;color:#197248;font-size:.62rem;line-height:1;font-weight:850}
+.job-company{font-size:.82rem!important;font-weight:700;color:#55728f!important}
+.job-details-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:12px}
+.job-details-grid>span{min-width:0;padding:9px 10px;border-radius:12px;background:#f7faff;color:#607993;display:grid;grid-template-columns:16px 1fr;gap:2px 5px;font-size:.7rem;line-height:1.32}
+.job-details-grid svg{grid-row:1/3;color:#0c61c7;margin-top:1px}
+.job-details-grid b{color:#2c5885;font-size:.64rem;text-transform:uppercase;letter-spacing:.04em}
+.job-description{margin-top:11px!important;color:#496a8c!important}
+.job-requirements{margin-top:10px;padding:10px 11px;border-radius:12px;background:#f8fbfe}
+.job-requirements strong{display:block;margin-bottom:4px;color:#315d88;font-size:.7rem}
+.job-requirements p{font-size:.75rem!important}
+.job-footer small{min-width:0;line-height:1.35}
+
+.resume-locked-panel,.resume-intro,.provider-card,.resume-versions{border:1px solid var(--border);border-radius:17px;background:#fff;box-shadow:var(--soft)}
+.resume-locked-panel{padding:18px;display:grid;grid-template-columns:42px 1fr;gap:12px}
+.resume-locked-panel>span,.resume-intro>span{width:42px;height:42px;border-radius:13px;background:#eaf4ff;color:#0b61c8;display:grid;place-items:center}
+.resume-locked-panel h2,.resume-intro h2,.provider-card h2{margin:0;color:#103b72;font-size:1rem}
+.resume-locked-panel p,.resume-intro p,.provider-card p{margin:4px 0 0;color:#607894;font-size:.79rem;line-height:1.48}
+.resume-locked-panel .primary-button{grid-column:1/-1;margin-top:2px}
+.resume-panel{display:grid;gap:12px}
+.resume-intro{padding:14px;display:grid;grid-template-columns:42px 1fr;gap:11px;align-items:center}
+.resume-form{gap:12px}
+.resume-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.resume-form textarea{line-height:1.45}
+.resume-success{display:flex;align-items:center;gap:7px;padding:10px 11px;border-radius:12px;background:#edf8f2;color:#197248;font-size:.76rem;font-weight:800}
+.resume-versions{padding:14px;display:grid;gap:10px}
+.section-heading>div{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.section-heading strong{font-size:.84rem;color:#234f7d}
+.section-heading span{font-size:.68rem;color:#7b8fa5}
+.resume-version-list{display:grid;gap:7px}
+.resume-version-list article{display:grid;grid-template-columns:28px 1fr auto;gap:8px;align-items:center;padding:9px 10px;border-radius:12px;background:#f7faff;color:#315c87}
+.resume-version-list article>svg{color:#0b61c8}
+.resume-version-list article strong,.resume-version-list article span{display:block}
+.resume-version-list article strong{font-size:.75rem}
+.resume-version-list article span{margin-top:2px;color:#7890a7;font-size:.66rem}
+.resume-version-list article>b{padding:4px 7px;border-radius:999px;background:#eaf4ff;color:#0a5fc7;font-size:.59rem}
+
+.provider-list{display:grid;gap:10px}
+.provider-card{padding:14px;display:grid;grid-template-columns:42px 1fr;gap:11px}
+.provider-icon{width:42px;height:42px;border-radius:13px;background:#edf8f2;color:#197248;display:grid;place-items:center}
+.provider-card .secondary-button{grid-column:1/-1;justify-self:start;min-height:38px}
+
+.dictionary-controls{display:grid;gap:8px}
+.dictionary-letter-row{display:flex;gap:6px;overflow:auto;padding:1px 0 2px;scrollbar-width:none}
+.dictionary-letter-row button{flex:0 0 auto;min-width:34px;height:34px;border:1px solid #dae7f2;border-radius:10px;background:#fff;color:#52708f;font-size:.72rem;font-weight:850;cursor:pointer}
+.dictionary-letter-row button.active{background:#0c60ca;border-color:#0c60ca;color:#fff}
+.dictionary-result-summary span{display:flex;align-items:center;gap:6px}
+.dictionary-list-v2{gap:9px}
+.dictionary-entry-v2{padding:14px 15px}
+.dictionary-entry-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.dictionary-entry-head>div>span{color:#7b8ea4;font-size:.64rem;font-weight:850;text-transform:uppercase;letter-spacing:.06em}
+.dictionary-entry-head h2{margin:3px 0 0;color:#0a3978;font-size:1.22rem;letter-spacing:-.01em}
+.dictionary-entry-head>small{flex:0 0 auto;padding:4px 7px;border-radius:999px;background:#f3f7fb;color:#7b8da0;font-size:.62rem}
+.dictionary-translation-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:11px}
+.dictionary-translation-grid>div{padding:9px 10px;border-radius:12px;background:#f8fbff}
+.dictionary-translation-grid b{display:block;margin-bottom:3px;color:#3a6289;font-size:.64rem;text-transform:uppercase;letter-spacing:.04em}
+.dictionary-translation-grid p{font-size:.78rem!important;color:#4f6d8c!important;word-break:break-word}
+
+@media (max-width:520px){
+  .jobs-section-tabs{grid-template-columns:1fr}
+  .jobs-section-tabs button{justify-content:flex-start;padding-left:12px}
+  .job-details-grid,.resume-form-grid,.dictionary-translation-grid{grid-template-columns:1fr}
+  .jobs-result-summary,.dictionary-result-summary{align-items:flex-start;flex-direction:column;gap:3px}
+  .jobs-result-summary small,.dictionary-result-summary small{text-align:left}
+}
