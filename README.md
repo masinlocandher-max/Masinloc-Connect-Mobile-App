@@ -21,8 +21,25 @@ This repository contains the mobile action layer for the Masinloc digital ecosys
 - Home
 - Marketplace
 - Jobs
-- Report
+- Help Desk
 - More
+
+## Main menu
+
+- Home
+- Community Bulletin
+- Marketplace
+- My Orders
+- Jobs & Opportunities
+- For Sellers
+- Discover Masinloc
+- Profile / Account
+- Sambal Tina
+- About Masinloc Connect
+- Masinloc History
+- Privacy, Terms & Policies
+- Help Desk
+- Contact / Feedback
 
 ## Build
 
