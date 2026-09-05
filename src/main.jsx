@@ -4,6 +4,7 @@ import App from './App.jsx';
 import './styles.css';
 import './home.css';
 import './showcase.css';
+import './join.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
