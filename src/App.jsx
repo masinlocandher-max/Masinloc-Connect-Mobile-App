@@ -19,6 +19,7 @@ const JOIN_SEEN_KEY = 'masinloc-connect-join-seen-v1';
 
 export default function App() {
   const [view, setView] = useState('home');
+  const [viewHistory, setViewHistory] = useState([]);
   const [session, setSession] = useState(null);
   const [profile, setProfile] = useState(null);
   const [authPrompt, setAuthPrompt] = useState(null);
@@ -56,6 +57,7 @@ export default function App() {
   const enterApp = useCallback(() => {
     window.localStorage.setItem(JOIN_SEEN_KEY, 'yes');
     setShowJoin(false);
+    setViewHistory([]);
     setView('home');
     window.scrollTo({ top: 0, behavior: 'auto' });
   }, []);
@@ -65,11 +67,24 @@ export default function App() {
     setAuthPrompt({ reason, destination }); return false;
   }, [user]);
 
+  const goBack = () => {
+    setViewHistory((items) => {
+      const next = [...items];
+      const previous = next.pop() || 'home';
+      setView(previous);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return next;
+    });
+  };
+
   const navigate = (next) => {
+    if (next === '__back') return goBack();
     if ((next === 'profile' || next === 'resume') && !user) return requireAccount(next === 'resume' ? 'create and manage your Signature Resume' : 'open your profile and account settings', next);
     if (next === 'saved' && !user) return requireAccount('view your saved jobs and content', 'saved');
     if ((next === 'orders' || next === 'tracking') && !user) return requireAccount('view your orders and delivery status', next);
-    setView(next); window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (next !== view) setViewHistory((items) => [...items, view].slice(-20));
+    setView(next);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   if (!sessionReady) return <div className="entry-loading"><img src="/assets/masinloc-connect-logo.webp" alt="Masinloc Connect" /></div>;
@@ -105,10 +120,10 @@ export default function App() {
 
   return <div className="app-frame app-frame-v2">
     <div className={`app-shell${immersive ? ' immersive-shell' : ''}`}>
-      {view === 'home' || immersive ? null : <ScreenTopBar onBack={() => navigate(primary ? 'home' : 'more')} onHome={() => navigate('home')} />}
+      {view === 'home' || immersive ? null : <ScreenTopBar onBack={goBack} onHome={() => navigate('home')} />}
       <main className={view === 'home' ? 'screen home-root' : immersive ? 'screen showcase-screen' : 'screen'} id="main-content">{screens[view] || screens.home}</main>
       <BottomNav active={activeTab} onNavigate={navigate} />
     </div>
-    {authPrompt ? <AccountSheet prompt={authPrompt} user={user} onClose={() => setAuthPrompt(null)} onSignedIn={() => { const destination = authPrompt.destination; setAuthPrompt(null); if (destination) setView(destination); }} /> : null}
+    {authPrompt ? <AccountSheet prompt={authPrompt} user={user} onClose={() => setAuthPrompt(null)} onSignedIn={() => { const destination = authPrompt.destination; setAuthPrompt(null); if (destination) navigate(destination); }} /> : null}
   </div>;
 }
