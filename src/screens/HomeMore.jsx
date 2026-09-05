@@ -40,7 +40,7 @@ const weatherLabels = {
 const homeCards = [
   { id: 'dictionary', title: 'Sambal Tina', body: 'Search the Sambal Tina dictionary', icon: BookOpen, tone: 'orange' },
   { id: 'history', title: 'Masinloc History', body: 'Our roots, our stories, our Masinloc.', icon: Building2, tone: 'blue' },
-  { id: 'jobs', title: 'Jobs & Opportunities', body: 'Jobs, scholarships and more', icon: BriefcaseBusiness, tone: 'green' },
+  { id: 'jobs', title: 'Jobs & Opportunities', body: 'Search jobs from trusted providers', icon: BriefcaseBusiness, tone: 'green' },
   { id: 'marketplace', title: 'Marketplace', body: 'Buy, sell and support local', icon: ShoppingCart, tone: 'red' },
   { id: 'sellers', title: 'For Sellers', body: 'List your business and access POS.', icon: Store, tone: 'violet' },
   { id: 'more', title: 'More Services', body: 'Contribute history, words and community knowledge.', icon: UsersRound, tone: 'purple' },
