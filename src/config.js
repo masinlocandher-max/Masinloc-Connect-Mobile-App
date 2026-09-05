@@ -1,5 +1,22 @@
 export const WEBSITE_BASE = 'https://www.masinloc-zambales.com';
 
+export const SOURCE_ARCHITECTURE = Object.freeze({
+  publicSource: Object.freeze({
+    website: WEBSITE_BASE,
+    repository: 'masinlocandher-max/Masinloc-Website',
+    rawDataBase: 'https://raw.githubusercontent.com/masinlocandher-max/Masinloc-Website/main/data',
+    role: 'canonical-public-source',
+  }),
+  operationalBackend: Object.freeze({
+    provider: 'Supabase',
+    role: 'operational-database-and-backend',
+  }),
+  mobileApp: Object.freeze({
+    repository: 'masinlocandher-max/Masinloc-Connect-Mobile-App',
+    role: 'mobile-action-and-presentation-layer',
+  }),
+});
+
 export const routes = {
   website: `${WEBSITE_BASE}/`,
   discover: `${WEBSITE_BASE}/discover/`,
