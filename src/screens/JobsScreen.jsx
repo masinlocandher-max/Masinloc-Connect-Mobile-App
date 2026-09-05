@@ -41,9 +41,15 @@ function isMasinloc(job) {
   return /masinloc/i.test(job.location || '');
 }
 
+function isOpenJob(job) {
+  if (!job.closing_date) return true;
+  const closingTime = new Date(job.closing_date).getTime();
+  return !Number.isFinite(closingTime) || closingTime >= Date.now();
+}
+
 function JobCard({ job, provider, saved, onSave }) {
   const providerLabel = provider?.attribution_label || provider?.name || 'Trusted Job Provider';
-  const verified = job.verification_status === 'verified' || provider?.status === 'verified' || provider?.status === 'active';
+  const verified = ['verified', 'live'].includes(job.verification_status);
 
   return <article className="job-card job-card-v2">
     <div className="job-top">
@@ -172,11 +178,11 @@ function ResumePanel({ user, requireAccount }) {
 function ProvidersPanel({ state, onRetry }) {
   if (state.status === 'loading') return <div className="async-state">Loading trusted providers…</div>;
   if (state.status === 'error') return <div className="async-state error"><strong>Providers could not load.</strong><button type="button" onClick={onRetry}>Retry</button></div>;
-  if (!state.providers.length) return <EmptyState icon={ShieldCheck} title="No providers published yet" body="Trusted providers will appear here after they are connected and verified." />;
+  if (!state.providers.length) return <EmptyState icon={ShieldCheck} title="No live providers yet" body="Trusted providers will appear here after their connection is live." />;
 
   return <div className="provider-list">{state.providers.map((provider) => <article className="provider-card" key={provider.id}>
     <span className="provider-icon"><ShieldCheck size={21} /></span>
-    <div><h2>{provider.attribution_label || provider.name}</h2><p>{provider.public_note || 'Connected job provider for Masinloc Connect opportunities.'}</p></div>
+    <div><h2>{provider.attribution_label || provider.name}</h2><p>{provider.public_note || 'Live job provider connected to Masinloc Connect.'}</p></div>
     {provider.homepage_url ? <button className="secondary-button" type="button" onClick={() => window.open(provider.homepage_url, '_blank', 'noopener,noreferrer')}>Provider site <ExternalLink size={14} /></button> : null}
   </article>)}</div>;
 }
@@ -215,6 +221,7 @@ export default function JobsScreen({ user, requireAccount }) {
     const needle = query.trim().toLowerCase();
     return jobsState.jobs.filter((job) => {
       const text = `${job.title || ''} ${job.company || ''} ${job.location || ''} ${job.work_setup || ''} ${job.employment_type || ''}`.toLowerCase();
+      if (!isOpenJob(job)) return false;
       if (filter === 'remote' && !isRemote(job)) return false;
       if (filter === 'masinloc' && !isMasinloc(job)) return false;
       return !needle || text.includes(needle);
