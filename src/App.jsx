@@ -81,7 +81,7 @@ export default function App() {
     profile: <ProfileScreen user={user} profile={profile} onSaved={setProfile} />,
     discover: <DiscoverScreen />,
     saved: <SavedScreen user={user} navigate={navigate} requireAccount={requireAccount} />,
-    marketplace: <MarketplaceScreen />,
+    marketplace: <MarketplaceScreen navigate={navigate} />,
     jobs: <JobsScreen user={user} requireAccount={requireAccount} navigate={navigate} />,
     resume: <SignatureResumeScreen user={user} requireAccount={requireAccount} />,
     applications: <ApplicationsScreen />,
