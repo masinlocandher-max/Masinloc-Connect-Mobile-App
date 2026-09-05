@@ -4,7 +4,8 @@ import { bottomNav } from './navigation.js';
 import { BottomNav, ScreenTopBar } from './components/UI.jsx';
 import AccountSheet from './components/AccountSheet.jsx';
 import JoinFlow from './screens/JoinFlow.jsx';
-import { HomeHub, MoreScreen } from './screens/HomeMore.jsx';
+import { HomeHub } from './screens/HomeMore.jsx';
+import MoreServicesScreen from './screens/MoreServicesScreen.jsx';
 import { NotificationsScreen, SavedScreen } from './screens/HomeUtilities.jsx';
 import MarketplaceScreen from './screens/MarketplaceScreen.jsx';
 import JobsScreen from './screens/JobsScreen.jsx';
@@ -85,7 +86,7 @@ export default function App() {
     resume: <SignatureResumeScreen user={user} requireAccount={requireAccount} />,
     applications: <ApplicationsScreen />,
     report: <HelpDeskScreen />,
-    more: <MoreScreen navigate={navigate} />,
+    more: <MoreServicesScreen navigate={navigate} />,
     'submit-history': <ContributionScreen mode="submit-history" />,
     'submit-word': <ContributionScreen mode="submit-word" />,
     'my-submissions': <MySubmissionsScreen navigate={navigate} />,
