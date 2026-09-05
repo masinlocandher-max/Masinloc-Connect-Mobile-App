@@ -16,6 +16,7 @@ import { moreItems } from '../navigation.js';
 import { MenuCard, ScreenTitle } from '../components/UI.jsx';
 
 const HIGHLIGHT_ASSET_BASE = `${WEBSITE_BASE}/assets/locations`;
+const MASINLOC_TIME_ZONE = 'Asia/Manila';
 
 // HD originals are curated in Google Drive > Highlight Images. The mobile app
 // consumes the canonical optimized derivatives published by Masinloc-Website.
@@ -45,6 +46,33 @@ const homeCards = [
   { id: 'more', title: 'More Services', body: 'Contribute history, words and community knowledge.', icon: UsersRound, tone: 'purple' },
 ];
 
+function getMasinlocHour() {
+  return Number(new Intl.DateTimeFormat('en-PH', {
+    timeZone: MASINLOC_TIME_ZONE,
+    hour: '2-digit',
+    hourCycle: 'h23',
+  }).format(new Date()));
+}
+
+function getMasinlocGreeting() {
+  const hour = getMasinlocHour();
+  if (hour < 12) return 'Maabig a bocla cababali!';
+  if (hour < 18) return 'Maabig a apon cababali!';
+  return 'Maabig a yabi cababali!';
+}
+
+function useMasinlocGreeting() {
+  const [greeting, setGreeting] = useState(getMasinlocGreeting);
+
+  useEffect(() => {
+    const updateGreeting = () => setGreeting(getMasinlocGreeting());
+    const timer = window.setInterval(updateGreeting, 60_000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  return greeting;
+}
+
 function useMasinlocWeather() {
   const [weather, setWeather] = useState({ state: 'loading' });
   useEffect(() => {
@@ -71,6 +99,7 @@ export function HomeHub({ navigate }) {
   const [slide, setSlide] = useState(0);
   const [query, setQuery] = useState('');
   const weather = useMasinlocWeather();
+  const greeting = useMasinlocGreeting();
 
   useEffect(() => {
     const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
@@ -119,7 +148,7 @@ export function HomeHub({ navigate }) {
       </div>
 
       <div className="hero-message">
-        <h1>Maabig a<br />bocla cababali!</h1>
+        <h1>{greeting}</h1>
         <p>Let’s build a brighter<br />Masinloc together.</p>
       </div>
     </section>
@@ -156,5 +185,5 @@ export function MoreScreen({ navigate }) {
     <section className="more-menu-grid" aria-label="More services">
       {moreItems.map((item) => <MenuCard compact key={`${item.id}-${item.label}`} item={item} onClick={() => navigate(item.id)} />)}
     </section>
-  </div;
+  </div>;
 }
