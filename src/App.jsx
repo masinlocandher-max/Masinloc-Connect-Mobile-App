@@ -9,8 +9,10 @@ import { NotificationsScreen, SavedScreen } from './screens/HomeUtilities.jsx';
 import MarketplaceScreen from './screens/MarketplaceScreen.jsx';
 import JobsScreen from './screens/JobsScreen.jsx';
 import HelpDeskScreen from './screens/HelpDeskScreen.jsx';
+import SellerHub, { SellerGuidelinesScreen } from './screens/SellerHub.jsx';
+import { ApplicationsScreen, ContributionScreen, MySubmissionsScreen, SignatureResumeScreen } from './screens/ActionScreens.jsx';
 import { BulletinScreen, DictionaryScreen, DiscoverScreen, HistoryScreen } from './screens/ContentScreens.jsx';
-import { AboutScreen, ContactScreen, OrdersScreen, PoliciesScreen, ProfileScreen, SellerScreen } from './screens/UtilityScreens.jsx';
+import { AboutScreen, ContactScreen, OrdersScreen, PoliciesScreen, ProfileScreen } from './screens/UtilityScreens.jsx';
 
 const JOIN_SEEN_KEY = 'masinloc-connect-join-seen-v1';
 
@@ -63,7 +65,7 @@ export default function App() {
   }, [user]);
 
   const navigate = (next) => {
-    if (next === 'profile' && !user) return requireAccount('open your profile and account settings', 'profile');
+    if ((next === 'profile' || next === 'resume') && !user) return requireAccount(next === 'resume' ? 'create and manage your Signature Resume' : 'open your profile and account settings', next);
     if (next === 'saved' && !user) return requireAccount('view your saved jobs and content', 'saved');
     if ((next === 'orders' || next === 'tracking') && !user) return requireAccount('view your orders and delivery status', next);
     setView(next); window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -80,12 +82,19 @@ export default function App() {
     saved: <SavedScreen user={user} navigate={navigate} requireAccount={requireAccount} />,
     marketplace: <MarketplaceScreen />,
     jobs: <JobsScreen user={user} requireAccount={requireAccount} navigate={navigate} />,
+    resume: <SignatureResumeScreen user={user} requireAccount={requireAccount} />,
+    applications: <ApplicationsScreen />,
     report: <HelpDeskScreen />,
     more: <MoreScreen navigate={navigate} />,
+    'submit-history': <ContributionScreen mode="submit-history" />,
+    'submit-word': <ContributionScreen mode="submit-word" />,
+    'my-submissions': <MySubmissionsScreen navigate={navigate} />,
+    'suggest-correction': <ContributionScreen mode="suggest-correction" />,
     bulletin: <BulletinScreen />,
     orders: <OrdersScreen mode="orders" user={user} />,
     tracking: <OrdersScreen mode="tracking" user={user} />,
-    sellers: <SellerScreen />,
+    sellers: <SellerHub navigate={navigate} />,
+    'seller-guidelines': <SellerGuidelinesScreen />,
     dictionary: <DictionaryScreen navigate={navigate} />,
     history: <HistoryScreen />,
     about: <AboutScreen />,
