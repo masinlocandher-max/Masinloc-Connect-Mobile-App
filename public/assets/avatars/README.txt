@@ -1,0 +1,1 @@
+Masinloc Connect fruit avatars derived from the user-approved avatar sheet: mango, pineapple, coconut, banana, apple, watermelon, orange, grapes, strawberry.
