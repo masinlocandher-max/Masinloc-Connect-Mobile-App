@@ -19,6 +19,7 @@ export default function App() {
   const user = session?.user || null;
   const primary = bottomNav.some((item) => item.id === view);
   const activeTab = primary ? view : 'home';
+  const immersive = view === 'jobs' || view === 'dictionary';
 
   const refreshProfile = useCallback(async (activeUser) => {
     if (!activeUser) return setProfile(null);
@@ -51,14 +52,14 @@ export default function App() {
     discover: <DiscoverScreen />,
     saved: <SavedScreen user={user} navigate={navigate} requireAccount={requireAccount} />,
     marketplace: <MarketplaceScreen />,
-    jobs: <JobsScreen user={user} requireAccount={requireAccount} />,
+    jobs: <JobsScreen user={user} requireAccount={requireAccount} navigate={navigate} />,
     report: <HelpDeskScreen />,
     more: <MoreScreen navigate={navigate} />,
     bulletin: <BulletinScreen />,
     orders: <OrdersScreen mode="orders" user={user} />,
     tracking: <OrdersScreen mode="tracking" user={user} />,
     sellers: <SellerScreen />,
-    dictionary: <DictionaryScreen />,
+    dictionary: <DictionaryScreen navigate={navigate} />,
     history: <HistoryScreen />,
     about: <AboutScreen />,
     policies: <PoliciesScreen />,
@@ -66,9 +67,9 @@ export default function App() {
   };
 
   return <div className="app-frame app-frame-v2">
-    <div className="app-shell">
-      {view === 'home' ? null : <ScreenTopBar onBack={() => navigate(primary ? 'home' : 'more')} onHome={() => navigate('home')} />}
-      <main className={view === 'home' ? 'screen home-root' : 'screen'} id="main-content">{screens[view] || screens.home}</main>
+    <div className={`app-shell${immersive ? ' immersive-shell' : ''}`}>
+      {view === 'home' || immersive ? null : <ScreenTopBar onBack={() => navigate(primary ? 'home' : 'more')} onHome={() => navigate('home')} />}
+      <main className={view === 'home' ? 'screen home-root' : immersive ? 'screen showcase-screen' : 'screen'} id="main-content">{screens[view] || screens.home}</main>
       <BottomNav active={activeTab} onNavigate={navigate} />
     </div>
     {authPrompt ? <AccountSheet prompt={authPrompt} user={user} onClose={() => setAuthPrompt(null)} onSignedIn={() => { const destination = authPrompt.destination; setAuthPrompt(null); if (destination) setView(destination); }} /> : null}
