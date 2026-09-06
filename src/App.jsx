@@ -10,10 +10,13 @@ import { NotificationsScreen, SavedScreen } from './screens/HomeUtilities.jsx';
 import MarketplaceScreen from './screens/MarketplaceScreen.jsx';
 import JobsScreen from './screens/JobsScreen.jsx';
 import HelpDeskScreen from './screens/HelpDeskScreen.jsx';
-import SellerHub, { SellerGuidelinesScreen } from './screens/SellerHub.jsx';
-import { ApplicationsScreen, ContributionScreen, MySubmissionsScreen, SignatureResumeScreen } from './screens/ActionScreens.jsx';
+import SellerHub, { SellerGuidelinesScreen } from './screens/SellerHubLive.jsx';
+import { SignatureResumeScreen } from './screens/ActionScreens.jsx';
+import ApplicationsScreen from './screens/ApplicationsLive.jsx';
+import { ContributionScreen, MySubmissionsScreen } from './screens/ContributionsLive.jsx';
+import BuyerOrdersScreen from './screens/BuyerOrdersScreen.jsx';
 import { BulletinScreen, DictionaryScreen, DiscoverScreen, HistoryScreen } from './screens/ContentScreens.jsx';
-import { AboutScreen, ContactScreen, OrdersScreen, PoliciesScreen, ProfileScreen } from './screens/UtilityScreens.jsx';
+import { AboutScreen, ContactScreen, PoliciesScreen, ProfileScreen } from './screens/UtilityScreens.jsx';
 
 const JOIN_SEEN_KEY = 'masinloc-connect-join-seen-v1';
 
@@ -99,7 +102,7 @@ export default function App() {
     marketplace: <MarketplaceScreen navigate={navigate} />,
     jobs: <JobsScreen user={user} requireAccount={requireAccount} navigate={navigate} />,
     resume: <SignatureResumeScreen user={user} requireAccount={requireAccount} />,
-    applications: <ApplicationsScreen />,
+    applications: <ApplicationsScreen user={user} />,
     report: <HelpDeskScreen />,
     more: <MoreServicesScreen navigate={navigate} />,
     'submit-history': <ContributionScreen mode="submit-history" />,
@@ -107,8 +110,8 @@ export default function App() {
     'my-submissions': <MySubmissionsScreen navigate={navigate} />,
     'suggest-correction': <ContributionScreen mode="suggest-correction" />,
     bulletin: <BulletinScreen />,
-    orders: <OrdersScreen mode="orders" user={user} navigate={navigate} />,
-    tracking: <OrdersScreen mode="tracking" user={user} navigate={navigate} />,
+    orders: <BuyerOrdersScreen mode="orders" user={user} />,
+    tracking: <BuyerOrdersScreen mode="tracking" user={user} />,
     sellers: <SellerHub navigate={navigate} />,
     'seller-guidelines': <SellerGuidelinesScreen />,
     dictionary: <DictionaryScreen navigate={navigate} />,
