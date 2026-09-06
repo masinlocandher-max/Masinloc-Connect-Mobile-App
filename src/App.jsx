@@ -10,7 +10,7 @@ import { NotificationsScreen, SavedScreen } from './screens/HomeUtilities.jsx';
 import MarketplaceScreen from './screens/MarketplaceScreen.jsx';
 import JobsScreen from './screens/JobsScreen.jsx';
 import HelpDeskScreen from './screens/HelpDeskScreen.jsx';
-import SellerHub, { SellerGuidelinesScreen } from './screens/SellerHub.jsx';
+import SellerHub, { SellerGuidelinesScreen } from './screens/SellerHubLive.jsx';
 import { SignatureResumeScreen } from './screens/ActionScreens.jsx';
 import ApplicationsScreen from './screens/ApplicationsLive.jsx';
 import { ContributionScreen, MySubmissionsScreen } from './screens/ContributionsLive.jsx';
