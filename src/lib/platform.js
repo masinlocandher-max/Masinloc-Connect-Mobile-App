@@ -1,15 +1,18 @@
+import { Capacitor } from '@capacitor/core';
 import { createClient } from '@supabase/supabase-js';
 import { WEBSITE_BASE } from '../config.js';
 
 export const SUPABASE_URL = 'https://uwcqvsitjtknxsaypjxj.supabase.co';
 export const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_qsC-udp3YoJQFuE-lHPivg_wa8gYMeg';
 export const EMERGENCY_ENDPOINT = `${SUPABASE_URL}/functions/v1/emergency-response`;
+export const NATIVE_AUTH_REDIRECT = 'com.masinloc.connect://auth/callback';
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: true,
+    flowType: 'pkce',
   },
 });
 
@@ -62,15 +65,31 @@ export async function getJobProviders() {
   return data || [];
 }
 
+export function authRedirectUrl() {
+  if (Capacitor.isNativePlatform()) return NATIVE_AUTH_REDIRECT;
+  return import.meta.env.VITE_AUTH_REDIRECT_URL || window.location.href.split('#')[0].split('?')[0];
+}
+
 export async function sendEmailSignIn(email) {
   const cleanEmail = String(email || '').trim().toLowerCase();
   if (!cleanEmail) throw new Error('Enter your email address.');
-  const redirectTo = import.meta.env.VITE_AUTH_REDIRECT_URL || window.location.href.split('#')[0];
   const { error } = await supabase.auth.signInWithOtp({
     email: cleanEmail,
-    options: { emailRedirectTo: redirectTo },
+    options: { emailRedirectTo: authRedirectUrl() },
   });
   if (error) throw error;
+}
+
+export async function handleNativeAuthCallback(url) {
+  if (!url || !url.startsWith(NATIVE_AUTH_REDIRECT)) return false;
+  const parsed = new URL(url);
+  const callbackError = parsed.searchParams.get('error_description') || parsed.searchParams.get('error');
+  if (callbackError) throw new Error(callbackError);
+  const code = parsed.searchParams.get('code');
+  if (!code) throw new Error('The sign-in link did not include a valid authorization code.');
+  const { error } = await supabase.auth.exchangeCodeForSession(code);
+  if (error) throw error;
+  return true;
 }
 
 export async function signOut() {
