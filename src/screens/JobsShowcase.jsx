@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, BriefcaseBusiness, Check, ChevronRight, ExternalLink, FileText, Heart, MapPin, Search, SlidersHorizontal } from 'lucide-react';
 import { getJobProviders, getLiveJobs, getSavedJobs, toggleSavedJob } from '../lib/platform.js';
+import { recordApplicationHandoff } from '../lib/mobileBackend.js';
 import { EmptyState } from '../components/UI.jsx';
 
 const categories = ['All', 'Jobs', 'Scholarships', 'Training', 'Internships'];
@@ -23,7 +24,7 @@ function posted(value) {
   return `Posted ${days} day${days === 1 ? '' : 's'} ago`;
 }
 
-function trackOpened(job) {
+function trackOpenedLocally(job) {
   try {
     const current = JSON.parse(localStorage.getItem(APPLICATIONS_KEY) || '[]');
     const existing = current.find((item) => item.job_id === job.id);
@@ -73,7 +74,8 @@ export default function JobsShowcase({ user, requireAccount, navigate }) {
   };
 
   const openOpportunity = (job) => {
-    trackOpened(job);
+    trackOpenedLocally(job);
+    if (user?.id) recordApplicationHandoff(user.id, job).catch(() => {});
     window.open(job.apply_url, '_blank', 'noopener,noreferrer');
   };
 
