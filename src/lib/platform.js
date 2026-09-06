@@ -198,3 +198,95 @@ export async function getCareerProfile(userId) {
   if (error) throw error;
   return data;
 }
+
+export async function getResumeVersions(userId) {
+  if (!userId) return [];
+  const { data, error } = await supabase
+    .from('resume_versions')
+    .select('id,name,target_role,template_code,is_primary,created_at,updated_at')
+    .eq('user_id', userId)
+    .order('updated_at', { ascending: false });
+  if (error) throw error;
+  return data || [];
+}
+
+export async function saveSignatureResume(user, form) {
+  const skills = String(form.skills || '').split(',').map((item) => item.trim()).filter(Boolean);
+  const targetRoles = form.target_role?.trim() ? [form.target_role.trim()] : [];
+  const profile = {
+    user_id: user.id,
+    full_name: form.full_name.trim(),
+    preferred_email: user.email,
+    current_location: form.current_location.trim() || null,
+    target_roles: targetRoles,
+    skills,
+    profile_summary: form.profile_summary.trim() || null,
+    availability: form.availability.trim() || null,
+    profile_completion: form.full_name.trim() && targetRoles.length ? 70 : 40,
+    updated_at: new Date().toISOString(),
+  };
+  const { error: profileError } = await supabase
+    .from('career_profiles')
+    .upsert(profile, { onConflict: 'user_id' });
+  if (profileError) throw profileError;
+
+  const snapshot = {
+    full_name: profile.full_name,
+    preferred_email: profile.preferred_email,
+    current_location: profile.current_location,
+    target_roles: profile.target_roles,
+    skills: profile.skills,
+    profile_summary: profile.profile_summary,
+    availability: profile.availability,
+  };
+  const { data, error } = await supabase
+    .from('resume_versions')
+    .insert({
+      user_id: user.id,
+      name: form.name.trim() || 'Signature Resume',
+      target_role: form.target_role.trim() || null,
+      template_code: 'signature_v1',
+      resume_snapshot: snapshot,
+      is_primary: true,
+    })
+    .select('id,name,target_role,is_primary,created_at,updated_at')
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+function emergencyRequest(payload) {
+  const controller = new AbortController();
+  const timer = window.setTimeout(() => controller.abort(), 12000);
+  return fetch(EMERGENCY_ENDPOINT, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+    cache: 'no-store',
+    signal: controller.signal,
+  }).then(async (response) => {
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || !data.ok) throw new Error(data.error || `Request failed (${response.status})`);
+    return data;
+  }).finally(() => window.clearTimeout(timer));
+}
+
+export async function submitEmergencyReport(report) {
+  return emergencyRequest({ action: 'submit', report });
+}
+
+export async function getEmergencyStatus(clientReportId, reportSecret) {
+  return emergencyRequest({
+    action: 'status',
+    client_report_id: clientReportId,
+    report_secret: reportSecret,
+  });
+}
+
+export function randomReportSecret() {
+  const bytes = new Uint8Array(32);
+  crypto.getRandomValues(bytes);
+  let value = '';
+  bytes.forEach((byte) => { value += String.fromCharCode(byte); });
+  return btoa(value).replaceAll('+', '-').replaceAll('/', '_').replaceAll('=', '');
+}
