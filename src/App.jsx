@@ -3,6 +3,7 @@ import { supabase, getMemberProfile } from './lib/platform.js';
 import { bottomNav } from './navigation.js';
 import { BottomNav, ScreenTopBar } from './components/UI.jsx';
 import AccountSheet from './components/AccountSheet.jsx';
+import NativeAuthBridge from './components/NativeAuthBridge.jsx';
 import JoinFlow from './screens/JoinFlow.jsx';
 import { HomeHub } from './screens/HomeMore.jsx';
 import MoreServicesScreen from './screens/MoreServicesScreen.jsx';
@@ -28,6 +29,7 @@ export default function App() {
   const [authPrompt, setAuthPrompt] = useState(null);
   const [sessionReady, setSessionReady] = useState(false);
   const [showJoin, setShowJoin] = useState(false);
+  const [authError, setAuthError] = useState('');
   const user = session?.user || null;
   const primary = bottomNav.some((item) => item.id === view);
   const activeTab = primary ? view : 'home';
@@ -56,6 +58,12 @@ export default function App() {
     });
     return () => { alive = false; listener.subscription.unsubscribe(); };
   }, [refreshProfile]);
+
+  useEffect(() => {
+    const onNativeAuthError = (event) => setAuthError(event.detail?.message || 'The sign-in link could not be completed.');
+    window.addEventListener('masinloc-auth-error', onNativeAuthError);
+    return () => window.removeEventListener('masinloc-auth-error', onNativeAuthError);
+  }, []);
 
   const enterApp = useCallback(() => {
     window.localStorage.setItem(JOIN_SEEN_KEY, 'yes');
@@ -90,8 +98,8 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  if (!sessionReady) return <div className="entry-loading"><img src="/assets/masinloc-connect-logo.webp" alt="Masinloc Connect" /></div>;
-  if (showJoin) return <JoinFlow user={user} onExplore={enterApp} onContinue={enterApp} />;
+  if (!sessionReady) return <><NativeAuthBridge /><div className="entry-loading"><img src="/assets/masinloc-connect-logo.webp" alt="Masinloc Connect" /></div></>;
+  if (showJoin) return <><NativeAuthBridge /><JoinFlow user={user} onExplore={enterApp} onContinue={enterApp} /></>;
 
   const screens = {
     home: <HomeHub navigate={navigate} />,
@@ -122,6 +130,8 @@ export default function App() {
   };
 
   return <div className="app-frame app-frame-v2">
+    <NativeAuthBridge />
+    {authError ? <div className="native-auth-error" role="alert"><span>{authError}</span><button type="button" onClick={() => setAuthError('')}>Dismiss</button></div> : null}
     <div className={`app-shell${immersive ? ' immersive-shell' : ''}`}>
       {view === 'home' || immersive ? null : <ScreenTopBar onBack={goBack} onHome={() => navigate('home')} />}
       <main className={view === 'home' ? 'screen home-root' : immersive ? 'screen showcase-screen' : 'screen'} id="main-content">{screens[view] || screens.home}</main>
