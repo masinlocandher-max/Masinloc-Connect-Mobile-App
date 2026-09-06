@@ -48,38 +48,42 @@ test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => localStorage.clear());
 });
 
-test('first-run guest flow reaches the mobile home', async ({ page }) => {
+test('first-run guest flow reaches the mobile home', async ({ page }, testInfo) => {
   await enterAsGuest(page);
   await expect(page.getByText('Jobs & Opportunities', { exact: true }).first()).toBeVisible();
   await expect(page.getByText('Marketplace', { exact: true }).first()).toBeVisible();
   await expect(page.getByText('More Services', { exact: true }).first()).toBeVisible();
+  await page.screenshot({ path: testInfo.outputPath('home.png'), fullPage: false });
 });
 
-test('Sambal Tina opens as a mobile-native dictionary', async ({ page }) => {
+test('Sambal Tina opens as a mobile-native dictionary', async ({ page }, testInfo) => {
   await enterAsGuest(page);
   await page.getByText('Sambal Tina', { exact: true }).first().click();
   await expect(page.getByRole('heading', { name: 'Sambal Tina' })).toBeVisible();
   await expect(page.getByPlaceholder(/Search a Tina word/)).toBeVisible();
   await expect(page.getByRole('heading', { name: 'abagat' })).toBeVisible();
+  await page.screenshot({ path: testInfo.outputPath('dictionary.png'), fullPage: false });
 });
 
-test('Jobs opens, filters render, and trusted provider data appears', async ({ page }) => {
+test('Jobs opens, filters render, and trusted provider data appears', async ({ page }, testInfo) => {
   await enterAsGuest(page);
   await page.getByText('Jobs & Opportunities', { exact: true }).first().click();
   await expect(page.getByRole('heading', { name: 'Jobs & Opportunities' })).toBeVisible();
   await expect(page.getByPlaceholder(/Search jobs, companies, skills/)).toBeVisible();
   await expect(page.getByText('Customer Service Representative')).toBeVisible();
   await expect(page.getByText('Trusted Job Provider')).toBeVisible();
+  await page.screenshot({ path: testInfo.outputPath('jobs.png'), fullPage: false });
 });
 
-test('Marketplace and community contribution screens are reachable', async ({ page }) => {
+test('Marketplace and community contribution screens are reachable', async ({ page }, testInfo) => {
   await enterAsGuest(page);
   await page.getByText('Marketplace', { exact: true }).first().click();
   await expect(page.getByRole('heading', { name: 'Marketplace' })).toBeVisible();
   await expect(page.getByText('Sample Cafe')).toBeVisible();
-  await page.getByRole('button', { name: 'Home' }).click();
+  await page.getByLabel('Home', { exact: true }).click();
   await page.getByText('More Services', { exact: true }).first().click();
   await expect(page.getByRole('heading', { name: 'More Services' })).toBeVisible();
   await page.getByText('Submit Masinloc History', { exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Submit Masinloc History' })).toBeVisible();
+  await page.screenshot({ path: testInfo.outputPath('contribution.png'), fullPage: false });
 });
