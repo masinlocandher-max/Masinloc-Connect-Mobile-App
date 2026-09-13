@@ -7,6 +7,7 @@ import './showcase.css';
 import './join.css';
 import './native.css';
 import './auth.css';
+import './release.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
