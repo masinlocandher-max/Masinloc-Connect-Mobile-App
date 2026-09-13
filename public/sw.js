@@ -1,8 +1,9 @@
-const CACHE_VERSION = 'masinloc-connect-shell-v1';
+const CACHE_VERSION = 'masinloc-connect-shell-v2';
 const APP_SHELL = [
   '/',
   '/manifest.webmanifest',
-  '/assets/app-icon.svg',
+  '/assets/icons/icon-192.webp',
+  '/assets/icons/icon-512.webp',
   '/assets/masinloc-connect-logo.webp',
 ];
 
