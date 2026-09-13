@@ -8,6 +8,7 @@ import './join.css';
 import './native.css';
 import './auth.css';
 import './release.css';
+import './brand-fix.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
