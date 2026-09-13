@@ -31,7 +31,7 @@ const ProfileScreen = lazy(() => import('./screens/UtilityScreens.jsx').then((mo
 const JOIN_SEEN_KEY = 'masinloc-connect-join-seen-v1';
 
 function ScreenFallback() {
-  return <div className="async-state" role="status"><strong>Loading…</strong></div>;
+  return <div className="async-state" role="status" aria-live="polite"><strong>Loading…</strong></div>;
 }
 
 export default function App() {
@@ -43,6 +43,7 @@ export default function App() {
   const [sessionReady, setSessionReady] = useState(false);
   const [showJoin, setShowJoin] = useState(false);
   const [authError, setAuthError] = useState('');
+  const [online, setOnline] = useState(() => navigator.onLine);
   const user = session?.user || null;
   const primary = bottomNav.some((item) => item.id === view);
   const activeTab = primary ? view : 'home';
@@ -77,6 +78,23 @@ export default function App() {
     window.addEventListener('masinloc-auth-error', onNativeAuthError);
     return () => window.removeEventListener('masinloc-auth-error', onNativeAuthError);
   }, []);
+
+  useEffect(() => {
+    const setConnected = () => setOnline(true);
+    const setDisconnected = () => setOnline(false);
+    window.addEventListener('online', setConnected);
+    window.addEventListener('offline', setDisconnected);
+    return () => {
+      window.removeEventListener('online', setConnected);
+      window.removeEventListener('offline', setDisconnected);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!sessionReady || showJoin) return;
+    const main = document.getElementById('main-content');
+    main?.focus({ preventScroll: true });
+  }, [sessionReady, showJoin, view]);
 
   const enterApp = useCallback(() => {
     window.localStorage.setItem(JOIN_SEEN_KEY, 'yes');
@@ -121,7 +139,7 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  if (!sessionReady) return <><NativeAuthBridge /><div className="entry-loading"><img src="/assets/masinloc-connect-logo.webp" alt="Masinloc Connect" /></div></>;
+  if (!sessionReady) return <><NativeAuthBridge /><div className="entry-loading" role="status" aria-label="Loading Masinloc Connect"><img src="/assets/masinloc-connect-logo.webp" alt="Masinloc Connect" /></div></>;
   if (showJoin) return <><NativeAuthBridge /><JoinFlow user={user} onExplore={enterApp} onContinue={enterApp} /></>;
 
   const screens = {
@@ -151,11 +169,13 @@ export default function App() {
   };
 
   return <div className="app-frame app-frame-v2">
+    <a className="skip-link" href="#main-content">Skip to main content</a>
     <NativeAuthBridge onBack={handleNativeBack} />
     {authError ? <div className="native-auth-error" role="alert"><span>{authError}</span><button type="button" onClick={() => setAuthError('')}>Dismiss</button></div> : null}
+    {!online ? <div className="connectivity-banner" role="status" aria-live="polite"><strong>Offline mode</strong><span>Previously opened public content may still be available. Account sync and live services need a connection.</span></div> : null}
     <div className={`app-shell${immersive ? ' immersive-shell' : ''}`}>
       {view === 'home' || immersive ? null : <ScreenTopBar onBack={goBack} onHome={() => navigate('home')} />}
-      <main className={view === 'home' ? 'screen home-root' : immersive ? 'screen showcase-screen' : 'screen'} id="main-content"><Suspense fallback={<ScreenFallback />}>{screens[view] || screens.home}</Suspense></main>
+      <main className={view === 'home' ? 'screen home-root' : immersive ? 'screen showcase-screen' : 'screen'} id="main-content" tabIndex="-1"><Suspense fallback={<ScreenFallback />}>{screens[view] || screens.home}</Suspense></main>
       <BottomNav active={activeTab} onNavigate={navigate} />
     </div>
     {authPrompt ? <AccountSheet prompt={authPrompt} user={user} onClose={() => setAuthPrompt(null)} onSignedIn={() => { const destination = authPrompt.destination; setAuthPrompt(null); if (destination) navigate(destination); }} /> : null}
