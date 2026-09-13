@@ -1,18 +1,9 @@
 import { useEffect, useState } from 'react';
-import { AlertTriangle, BriefcaseBusiness, ChevronRight, CircleUserRound, Compass, ExternalLink, FileText, HelpCircle, Mail, PackageCheck, Shield, ShoppingCart } from 'lucide-react';
+import { AlertTriangle, BriefcaseBusiness, ChevronRight, CircleUserRound, Compass, ExternalLink, FileText, HelpCircle, Mail, Shield, ShoppingCart } from 'lucide-react';
 import { routes } from '../config.js';
 import { saveMemberProfile, signOut, supabase } from '../lib/platform.js';
 import { AvatarPicker, DEFAULT_AVATAR_ID, FruitAvatar } from '../avatars.jsx';
 import { Callout, EmptyState, ScreenTitle } from '../components/UI.jsx';
-
-export function OrdersScreen({ mode, user, navigate }) {
-  const tracking = mode === 'tracking';
-  return <div className="screen-stack mobile-native-stack"><ScreenTitle title={tracking ? 'Order Status / Tracking' : 'My Orders'} subtitle={tracking ? 'Follow Marketplace order status when seller synchronization is connected.' : 'Your Marketplace orders will live here.'} />
-    <div className="native-callout"><PackageCheck size={23}/><div><strong>{user ? 'Order sync ready for connection' : 'Account-based order history'}</strong><span>{user ? 'No order is shown unless a real Marketplace order service returns it.' : 'Sign in is required when real order history and tracking are connected.'}</span></div></div>
-    <EmptyState icon={PackageCheck} title={user ? 'No synced orders yet' : 'Sign in to see your orders'} body={user ? 'The app does not invent order records. Your real purchases will appear here once Marketplace ordering is connected.' : 'Order history and tracking are account-based so they can stay connected across devices.'} />
-    {navigate ? <button className="primary-button full" type="button" onClick={()=>navigate('marketplace')}>Browse Marketplace <ShoppingCart size={16}/></button> : null}
-  </div>;
-}
 
 export function ProfileScreen({ user, profile, onSaved, navigate }) {
   const savedAvatar = user?.user_metadata?.masinloc_avatar || DEFAULT_AVATAR_ID;
