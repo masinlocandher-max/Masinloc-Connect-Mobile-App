@@ -44,12 +44,3 @@ jobs:
 
       - name: Run end-to-end smoke tests
         run: npm run test:e2e
-
-      - name: Export screenshot previews
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: screenshot-previews
-          path: test-results/**/*.png
-          if-no-files-found: warn
-          retention-days: 1
