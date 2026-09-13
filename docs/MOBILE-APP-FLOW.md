@@ -105,7 +105,7 @@ Home and first-run UI remain in the initial bundle. Secondary product screens ar
 
 A release candidate should not be treated as ready merely because Vite builds. CI must also cover dependency audit, PWA/install packaging, browser interaction regressions, native auth configuration, native Help Desk location metadata, branded/native asset generation where safely supported, and Android/iOS compilation.
 
-Release dependencies should be locked and installed reproducibly. A committed package lock plus `npm ci` is preferred once the dependency graph is finalized.
+Release dependencies are locked in the committed `package-lock.json`. Browser and native CI use `npm ci`; changing dependency versions or overrides requires regenerating the lockfile and rerunning the full release gates.
 
 ## Data integrity rules
 
