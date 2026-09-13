@@ -30,9 +30,11 @@ Public browsing remains available without an account. Account prompts are reserv
 
 ## Jobs flow
 
-Jobs & Opportunities supports search, category filters, location/work filters, live Supabase opportunity data, active-provider attribution, saved jobs, Signature Resume, My Applications and external application links.
+Jobs & Opportunities supports search, category filters, location/work filters, live Supabase opportunity data, provider attribution, saved jobs, Signature Resume, My Applications and external application links.
 
-Only opportunities with `verification_status = verified` are surfaced by the mobile client. An external opportunity is recorded as `Opened externally` only when a real application URL exists and the user actually opens it. The app never marks an application as submitted unless the user explicitly confirms it or a real provider/application backend confirms it.
+The mobile client does not hard-code a competing interpretation of backend publication states. Public job and provider visibility is defined by Supabase grants and Row Level Security. The current backend exposes only rows that satisfy the public job/provider policies, including live, current opportunity conditions. This keeps the client aligned with the operational source of truth if publication-state names change later.
+
+An external opportunity is recorded as `Opened externally` only when a real application URL exists and the user actually opens it. The app never marks an application as submitted unless the user explicitly confirms it or a real provider/application backend confirms it.
 
 ## Marketplace and business-owner flow
 
@@ -60,12 +62,21 @@ More Services contains Submit Masinloc History, Submit a Sambal Tina Word, My Su
 
 ## Help Desk
 
-PNP / MDRRMO reporting remains available without an account. Reports are persisted on-device first, can capture GPS, support offline queueing and are shown as received only after the emergency service confirms delivery.
+PNP / MDRRMO reporting remains available without an account. A report can capture GPS, work offline and retry when connectivity returns. While an unsent report is queued, the incident payload remains on the current device because the app needs it to complete delivery.
+
+Once the emergency service confirms delivery, persistent device storage is minimized automatically. Description, GPS coordinates, reporter name, reporter contact details and precise location fields are removed. The device retains only the report identifier/secret required for status lookup, public reference, delivery/status timestamps, agency, incident type and a minimal location summary. Responder messages are fetched for the current session and are not retained in persistent device storage.
+
+A report is never shown as `received` until the emergency service confirms delivery.
+
+## Performance and loading
+
+Home and first-run UI remain in the initial bundle. Secondary product screens are lazy-loaded on demand so opening Masinloc Connect does not download every feature before the user needs it.
 
 ## Data integrity rules
 
 - Do not invent job listings, applications, products, orders, emergency delivery, moderation status or publication status.
 - Do not expose POS/order UI merely because a separate repository or future backend exists.
+- Let Supabase RLS define public operational job/provider visibility rather than duplicating mutable status rules in the client.
 - Reuse verified public data where appropriate without copying the website experience.
 - Do not present generic text-to-speech as verified Tina Sambal pronunciation.
 - Website = public source / long-form layer.
