@@ -1,4 +1,31 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 217" role="img" aria-labelledby="title">
-<title id="title">Masinloc Connect</title>
-<image width="900" height="217" href="data:image/webp;base64,UklGRkxxAABXRUJQVlA4IGBxAACwfwCdASqE..."/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 220" role="img" aria-labelledby="title desc">
+  <title id="title">Masinloc Connect</title>
+  <desc id="desc">Masinloc Connect multicolor geometric mark and wordmark.</desc>
+  <defs>
+    <linearGradient id="word" x1="0" x2="1">
+      <stop offset="0" stop-color="#1239A2"/>
+      <stop offset="0.34" stop-color="#1D72D8"/>
+      <stop offset="0.52" stop-color="#F7C61D"/>
+      <stop offset="0.72" stop-color="#F28A12"/>
+      <stop offset="1" stop-color="#EC1F28"/>
+    </linearGradient>
+    <linearGradient id="red" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#D90818"/><stop offset="1" stop-color="#FF3A10"/></linearGradient>
+    <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0A2A8D"/><stop offset="1" stop-color="#155BD9"/></linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFD521"/><stop offset="1" stop-color="#FF8B08"/></linearGradient>
+    <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FF4D0B"/><stop offset="1" stop-color="#F59B12"/></linearGradient>
+  </defs>
+  <g transform="translate(10 17)">
+    <path d="M12 20 L58 63 L58 151 L12 111 Z" fill="url(#red)"/>
+    <path d="M12 82 L58 123 L58 176 L12 137 Z" fill="url(#blue)"/>
+    <path d="M150 20 L104 63 L104 151 L150 111 Z" fill="url(#gold)"/>
+    <path d="M150 82 L104 123 L104 176 L150 137 Z" fill="url(#orange)"/>
+    <path d="M39 92 L75 58 Q81 52 87 58 L123 92 L105 110 L83 89 Q81 87 79 89 L57 110 Z" fill="url(#orange)"/>
+    <path d="M39 139 L75 106 Q81 100 87 106 L123 139 L105 158 L83 137 Q81 135 79 137 L57 158 Z" fill="url(#blue)"/>
+  </g>
+  <g transform="translate(192 38)">
+    <text x="0" y="78" font-family="Arial, Helvetica, sans-serif" font-size="82" font-weight="900" letter-spacing="-4" fill="url(#word)">MASINLOC</text>
+    <line x1="2" y1="111" x2="74" y2="111" stroke="#143A91" stroke-width="4"/>
+    <line x1="580" y1="111" x2="652" y2="111" stroke="#143A91" stroke-width="4"/>
+    <text x="88" y="131" font-family="Arial, Helvetica, sans-serif" font-size="37" font-weight="600" letter-spacing="20" fill="#143A91">CONNECT</text>
+  </g>
 </svg>
