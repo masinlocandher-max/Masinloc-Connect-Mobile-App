@@ -2,32 +2,22 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   AlertTriangle,
   ArrowRight,
+  Bell,
   BookOpen,
   BriefcaseBusiness,
   Building2,
+  CircleUserRound,
   CloudSun,
   Search,
   ShoppingCart,
   Store,
   UsersRound,
 } from 'lucide-react';
-import { MASINLOC_CENTER, WEATHER_ENDPOINT, WEBSITE_BASE } from '../config.js';
+import { MASINLOC_CENTER, WEATHER_ENDPOINT } from '../config.js';
 import { moreItems } from '../navigation.js';
 import { MenuCard, ScreenTitle } from '../components/UI.jsx';
 
-const HIGHLIGHT_ASSET_BASE = `${WEBSITE_BASE}/assets/locations`;
 const MASINLOC_TIME_ZONE = 'Asia/Manila';
-
-const highlights = [
-  { name: 'San Andres Church', src: `${HIGHLIGHT_ASSET_BASE}/san-andres-church-card-1200.webp`, position: '50% 48%' },
-  { name: 'Bacala Sandbar', src: `${HIGHLIGHT_ASSET_BASE}/bacala-sandbar-guesthouse-1120.webp`, position: '50% 54%' },
-  { name: 'Coto Kidz Pool', src: `${HIGHLIGHT_ASSET_BASE}/coto-kidz-pool-1120.webp`, position: '50% 52%' },
-  { name: 'Hamat River', src: `${HIGHLIGHT_ASSET_BASE}/hamat-river-1120.webp`, position: '50% 50%' },
-  { name: 'Masinloc Baywalk', src: `${HIGHLIGHT_ASSET_BASE}/masinloc-baywalk-1120.webp`, position: '50% 52%' },
-  { name: 'Sitio Buri', src: `${HIGHLIGHT_ASSET_BASE}/sitio-buri-1120.webp`, position: '50% 48%' },
-  { name: 'Bunga Cave', src: `${HIGHLIGHT_ASSET_BASE}/bunga-cave-1120.webp`, position: '50% 54%' },
-  { name: 'San Salvador Island', src: `${HIGHLIGHT_ASSET_BASE}/san-salvador-island-1120.webp`, position: '50% 48%' },
-];
 
 const weatherLabels = {
   0: 'Clear', 1: 'Mostly Clear', 2: 'Partly Cloudy', 3: 'Cloudy', 45: 'Foggy', 48: 'Foggy',
@@ -40,7 +30,7 @@ const homeCards = [
   { id: 'history', title: 'Masinloc History', body: 'Our roots, our stories, our Masinloc.', icon: Building2, tone: 'blue' },
   { id: 'jobs', title: 'Jobs & Opportunities', body: 'Jobs, scholarships and more', icon: BriefcaseBusiness, tone: 'green' },
   { id: 'marketplace', title: 'Marketplace', body: 'Discover and support local businesses', icon: ShoppingCart, tone: 'red' },
-  { id: 'sellers', title: 'For Business Owners', body: 'Submit and manage your Marketplace listing', icon: Store, tone: 'violet' },
+  { id: 'sellers', title: 'For Business Owners', body: 'Submit and manage your Marketplace listing', icon: Store, tone: 'gold' },
   { id: 'more', title: 'More Services', body: 'Contribute history, words and community knowledge.', icon: UsersRound, tone: 'purple' },
 ];
 
@@ -78,17 +68,9 @@ function useMasinlocWeather() {
 }
 
 export function HomeHub({ navigate }) {
-  const [slide, setSlide] = useState(0);
   const [query, setQuery] = useState('');
   const weather = useMasinlocWeather();
   const greeting = useMasinlocGreeting();
-
-  useEffect(() => {
-    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-    if (reduced) return undefined;
-    const timer = window.setInterval(() => setSlide((current) => (current + 1) % highlights.length), 5500);
-    return () => window.clearInterval(timer);
-  }, []);
 
   const searchResults = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -104,19 +86,35 @@ export function HomeHub({ navigate }) {
 
   const submitSearch = (event) => { event.preventDefault(); if (searchResults[0]) navigate(searchResults[0].id); };
 
-  return <div className="home-screen-v2">
-    <section className="home-hero" aria-label="Masinloc highlights">
-      <div className="hero-rotator" aria-hidden="true">{highlights.map((item, index) => <img key={item.src} src={item.src} alt="" className={index === slide ? 'hero-slide active' : 'hero-slide'} style={{ objectPosition: item.position }} loading={index < 2 ? 'eager' : 'lazy'} />)}</div>
-      <div className="hero-shade" aria-hidden="true" />
-      <div className="hero-brand-row"><img className="hero-logo" src="/assets/masinloc-connect-logo.webp" alt="Masinloc Connect — Connecting Masinloqueños to the World" /><div className="weather-card" aria-live="polite"><CloudSun size={31} strokeWidth={1.8} /><div><strong>{weather.state === 'ready' ? `${weather.temperature}°C` : '—'}</strong><span>{weather.state === 'ready' ? weather.condition : weather.state === 'loading' ? 'Loading' : 'Unavailable'}</span></div></div></div>
-      <div className="hero-message"><h1>{greeting}</h1><p>Let’s build a brighter<br />Masinloc together.</p></div>
+  return <div className="home-screen-v2 home-dashboard">
+    <div className="home-dashboard-glow" aria-hidden="true" />
+
+    <header className="home-dashboard-header">
+      <div className="home-brand-cluster">
+        <img className="home-dashboard-logo" src="/assets/masinloc-connect-logo.webp" alt="Masinloc Connect" />
+        <span>CONNECTING MASINLOQUEÑOS TO THE WORLD</span>
+      </div>
+      <div className="home-header-actions">
+        <button type="button" onClick={() => navigate('notifications')} aria-label="Notifications"><Bell size={21} /><i aria-hidden="true" /></button>
+        <button type="button" onClick={() => navigate('profile')} aria-label="Profile / Account"><CircleUserRound size={23} /></button>
+      </div>
+    </header>
+
+    <section className="home-greeting-row" aria-label="Masinloc welcome and weather">
+      <div className="home-greeting-copy">
+        <h1>{greeting}</h1>
+        <p>Let’s build a brighter Masinloc together.</p>
+      </div>
+      <div className="weather-card" aria-live="polite"><CloudSun size={31} strokeWidth={1.8} /><div><strong>{weather.state === 'ready' ? `${weather.temperature}°C` : '—'}</strong><span>{weather.state === 'ready' ? weather.condition : weather.state === 'loading' ? 'Loading' : 'Unavailable'}</span></div></div>
     </section>
 
     <div className="home-content-v2">
-      <form className="home-search" onSubmit={submitSearch} role="search"><Search size={26} strokeWidth={2.3} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search services, places, or information..." aria-label="Search Masinloc Connect" /></form>
+      <form className="home-search" onSubmit={submitSearch} role="search"><Search size={24} strokeWidth={2.2} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search services, jobs, businesses, places..." aria-label="Search Masinloc Connect" /></form>
       {query ? <div className="home-search-results">{searchResults.length ? searchResults.map((item) => <button key={item.id} type="button" onClick={() => navigate(item.id)}><div><strong>{item.title}</strong><span>{item.body}</span></div><ArrowRight size={18} /></button>) : <span>No matching service found.</span>}</div> : null}
-      <section className="home-service-grid" aria-label="Main services">{homeCards.map(({ id, title, body, icon: Icon, tone }) => <button key={id} className={`home-service-card home-tone-${tone}`} type="button" onClick={() => navigate(id)}><div className="home-service-top"><span className="home-service-icon"><Icon size={28} strokeWidth={2.35} /></span><ArrowRight className="home-service-arrow" size={22} /></div><strong>{title}</strong><span>{body}</span><i aria-hidden="true" /></button>)}</section>
-      <button className="report-issue-banner" type="button" onClick={() => navigate('report')}><span className="report-alert"><AlertTriangle size={31} fill="currentColor" /></span><span className="report-copy"><strong>Help Desk</strong><b>PNP / MDRRMO</b><small>Location · Details · Delivery status</small></span><span className="report-image" aria-hidden="true" /><span className="report-arrow"><ArrowRight size={28} /></span></button>
+
+      <section className="home-service-grid" aria-label="Main services">{homeCards.map(({ id, title, body, icon: Icon, tone }) => <button key={id} className={`home-service-card home-tone-${tone}`} type="button" onClick={() => navigate(id)}><span className="home-service-icon"><Icon size={27} strokeWidth={2.35} /></span><span className="home-service-copy"><strong>{title}</strong><small>{body}</small></span><ArrowRight className="home-service-arrow" size={21} /><i aria-hidden="true" /></button>)}</section>
+
+      <button className="report-issue-banner" type="button" onClick={() => navigate('report')}><span className="report-alert"><AlertTriangle size={31} fill="currentColor" /></span><span className="report-copy"><strong>Help Desk</strong><b>PNP or MDRRMO</b><small>Location · Details · Delivery status</small></span><span className="report-arrow"><ArrowRight size={26} /></span></button>
     </div>
   </div>;
 }
