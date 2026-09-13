@@ -138,3 +138,30 @@ test('Help Desk minimizes sensitive device data after confirmed delivery', async
   expect(stored.longitude).toBeUndefined();
   await page.screenshot({ path: testInfo.outputPath('helpdesk-delivered.png'), fullPage: false });
 });
+
+test('Help Desk recovers an interrupted send as queued for retry', async ({ page }) => {
+  await enterAsGuest(page);
+  await page.evaluate(() => {
+    localStorage.setItem('masinloc-connect-active-report-v2', JSON.stringify({
+      client_report_id:'interrupted-report',
+      report_secret:'interrupted-secret',
+      target_agency:'pnp',
+      report_mode:'emergency',
+      incident_type:'crime',
+      description:'This payload must remain until delivery succeeds.',
+      barangay:'North Poblacion',
+      sync_state:'sending',
+      status:'sending',
+      updated_local_at:new Date().toISOString(),
+    }));
+  });
+  await page.getByText('Help Desk', { exact: true }).first().click();
+  await expect(page.getByRole('heading', { name: 'Your Help Desk Report' })).toBeVisible();
+  await expect(page.getByText('Saved offline · not yet received')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Retry sending' })).toBeVisible();
+
+  const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('masinloc-connect-active-report-v2')));
+  expect(stored.sync_state).toBe('queued');
+  expect(stored.status).toBe('saved_offline');
+  expect(stored.description).toBe('This payload must remain until delivery succeeds.');
+});
