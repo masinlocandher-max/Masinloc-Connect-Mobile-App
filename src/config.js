@@ -25,7 +25,6 @@ export const routes = {
   dictionary: `${WEBSITE_BASE}/sambal-tina.html`,
   helpDesk: `${WEBSITE_BASE}/emergency/`,
   connect: `${WEBSITE_BASE}/connect.html`,
-  pos: `${WEBSITE_BASE}/posmasinloqueno/`,
 };
 
 export const assets = {
