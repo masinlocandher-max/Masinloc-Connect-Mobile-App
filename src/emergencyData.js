@@ -21,9 +21,21 @@ export function minimizeDeliveredReport(report) {
   };
 }
 
+export function recoverInterruptedReport(report) {
+  if (!report || report.sync_state !== 'sending') return report;
+  return {
+    ...report,
+    sync_state: 'queued',
+    status: 'saved_offline',
+    last_error: 'Delivery was interrupted before confirmation. Retry sending to confirm receipt.',
+    updated_local_at: new Date().toISOString(),
+  };
+}
+
 export function prepareReportForStorage(report) {
   if (!report) return null;
-  return report.sync_state === 'delivered' ? minimizeDeliveredReport(report) : report;
+  const recovered = recoverInterruptedReport(report);
+  return recovered.sync_state === 'delivered' ? minimizeDeliveredReport(recovered) : recovered;
 }
 
 export const reportStatusCopy = {
