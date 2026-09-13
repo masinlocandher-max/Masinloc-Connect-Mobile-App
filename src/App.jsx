@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { supabase, getMemberProfile } from './lib/platform.js';
 import { bottomNav } from './navigation.js';
 import { BottomNav, ScreenTopBar } from './components/UI.jsx';
@@ -6,19 +6,33 @@ import AccountSheet from './components/AccountSheet.jsx';
 import NativeAuthBridge from './components/NativeAuthBridge.jsx';
 import JoinFlow from './screens/JoinFlow.jsx';
 import { HomeHub } from './screens/HomeMore.jsx';
-import MoreServicesScreen from './screens/MoreServicesScreen.jsx';
-import { NotificationsScreen, SavedScreen } from './screens/HomeUtilities.jsx';
-import MarketplaceScreen from './screens/MarketplaceScreen.jsx';
-import JobsScreen from './screens/JobsScreen.jsx';
-import HelpDeskScreen from './screens/HelpDeskScreen.jsx';
-import SellerHub, { SellerGuidelinesScreen } from './screens/SellerHubLive.jsx';
-import { SignatureResumeScreen } from './screens/ActionScreens.jsx';
-import ApplicationsScreen from './screens/ApplicationsLive.jsx';
-import { ContributionScreen, MySubmissionsScreen } from './screens/ContributionsLive.jsx';
-import { BulletinScreen, DictionaryScreen, DiscoverScreen, HistoryScreen } from './screens/ContentScreens.jsx';
-import { AboutScreen, ContactScreen, PoliciesScreen, ProfileScreen } from './screens/UtilityScreens.jsx';
+
+const MoreServicesScreen = lazy(() => import('./screens/MoreServicesScreen.jsx'));
+const NotificationsScreen = lazy(() => import('./screens/HomeUtilities.jsx').then((module) => ({ default: module.NotificationsScreen })));
+const SavedScreen = lazy(() => import('./screens/HomeUtilities.jsx').then((module) => ({ default: module.SavedScreen })));
+const MarketplaceScreen = lazy(() => import('./screens/MarketplaceScreen.jsx'));
+const JobsScreen = lazy(() => import('./screens/JobsScreen.jsx'));
+const HelpDeskScreen = lazy(() => import('./screens/HelpDeskScreen.jsx'));
+const SellerHub = lazy(() => import('./screens/SellerHubLive.jsx'));
+const SellerGuidelinesScreen = lazy(() => import('./screens/SellerHubLive.jsx').then((module) => ({ default: module.SellerGuidelinesScreen })));
+const SignatureResumeScreen = lazy(() => import('./screens/ActionScreens.jsx').then((module) => ({ default: module.SignatureResumeScreen })));
+const ApplicationsScreen = lazy(() => import('./screens/ApplicationsLive.jsx'));
+const ContributionScreen = lazy(() => import('./screens/ContributionsLive.jsx').then((module) => ({ default: module.ContributionScreen })));
+const MySubmissionsScreen = lazy(() => import('./screens/ContributionsLive.jsx').then((module) => ({ default: module.MySubmissionsScreen })));
+const BulletinScreen = lazy(() => import('./screens/ContentScreens.jsx').then((module) => ({ default: module.BulletinScreen })));
+const DictionaryScreen = lazy(() => import('./screens/ContentScreens.jsx').then((module) => ({ default: module.DictionaryScreen })));
+const DiscoverScreen = lazy(() => import('./screens/ContentScreens.jsx').then((module) => ({ default: module.DiscoverScreen })));
+const HistoryScreen = lazy(() => import('./screens/ContentScreens.jsx').then((module) => ({ default: module.HistoryScreen })));
+const AboutScreen = lazy(() => import('./screens/UtilityScreens.jsx').then((module) => ({ default: module.AboutScreen })));
+const ContactScreen = lazy(() => import('./screens/UtilityScreens.jsx').then((module) => ({ default: module.ContactScreen })));
+const PoliciesScreen = lazy(() => import('./screens/UtilityScreens.jsx').then((module) => ({ default: module.PoliciesScreen })));
+const ProfileScreen = lazy(() => import('./screens/UtilityScreens.jsx').then((module) => ({ default: module.ProfileScreen })));
 
 const JOIN_SEEN_KEY = 'masinloc-connect-join-seen-v1';
+
+function ScreenFallback() {
+  return <div className="async-state" role="status"><strong>Loading…</strong></div>;
+}
 
 export default function App() {
   const [view, setView] = useState('home');
@@ -129,7 +143,7 @@ export default function App() {
     {authError ? <div className="native-auth-error" role="alert"><span>{authError}</span><button type="button" onClick={() => setAuthError('')}>Dismiss</button></div> : null}
     <div className={`app-shell${immersive ? ' immersive-shell' : ''}`}>
       {view === 'home' || immersive ? null : <ScreenTopBar onBack={goBack} onHome={() => navigate('home')} />}
-      <main className={view === 'home' ? 'screen home-root' : immersive ? 'screen showcase-screen' : 'screen'} id="main-content">{screens[view] || screens.home}</main>
+      <main className={view === 'home' ? 'screen home-root' : immersive ? 'screen showcase-screen' : 'screen'} id="main-content"><Suspense fallback={<ScreenFallback />}>{screens[view] || screens.home}</Suspense></main>
       <BottomNav active={activeTab} onNavigate={navigate} />
     </div>
     {authPrompt ? <AccountSheet prompt={authPrompt} user={user} onClose={() => setAuthPrompt(null)} onSignedIn={() => { const destination = authPrompt.destination; setAuthPrompt(null); if (destination) navigate(destination); }} /> : null}
