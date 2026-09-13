@@ -83,7 +83,7 @@ test('Marketplace and community contribution screens are reachable', async ({ pa
 
 test('guest Saved screen remains usable without forced sign-in', async ({ page }, testInfo) => {
   await enterAsGuest(page);
-  await page.getByLabel('Saved', { exact: true }).click();
+  await page.getByRole('button', { name: 'Saved', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Saved' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Device saves are available without an account' })).toBeVisible();
   await expect(page.getByRole('dialog')).toHaveCount(0);
