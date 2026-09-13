@@ -165,3 +165,28 @@ test('Help Desk recovers an interrupted send as queued for retry', async ({ page
   expect(stored.status).toBe('saved_offline');
   expect(stored.description).toBe('This payload must remain until delivery succeeds.');
 });
+
+test('release shell exposes keyboard navigation and accurate push-notification state', async ({ page }) => {
+  await enterAsGuest(page);
+  const skip = page.getByRole('link', { name: 'Skip to main content' });
+  await expect(skip).toHaveAttribute('href', '#main-content');
+  await page.getByRole('button', { name: 'Notifications', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Notifications' })).toBeVisible();
+  await expect(page.getByText('Device push alerts are not enabled yet')).toBeVisible();
+  await expect(page.getByText(/will not ask for notification permission/i)).toBeVisible();
+});
+
+test('previously opened canonical content remains available offline', async ({ page, context }, testInfo) => {
+  await enterAsGuest(page);
+  await page.getByText('Sambal Tina', { exact: true }).first().click();
+  await expect(page.getByRole('heading', { name: 'abagat' })).toBeVisible();
+  await page.waitForFunction(async () => (await caches.keys()).includes('masinloc-connect-canonical-v1'));
+
+  await page.unroute('**/data/sambal-tina.json');
+  await page.getByLabel('Home', { exact: true }).click();
+  await context.setOffline(true);
+  await expect(page.getByText('Offline mode', { exact: true })).toBeVisible();
+  await page.getByText('Sambal Tina', { exact: true }).first().click();
+  await expect(page.getByRole('heading', { name: 'abagat' })).toBeVisible();
+  await page.screenshot({ path: testInfo.outputPath('offline-dictionary.png'), fullPage: false });
+});
