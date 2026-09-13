@@ -32,6 +32,18 @@ Public browsing remains available without an account. Account prompts are reserv
 
 Android hardware Back participates in Masinloc Connect navigation rather than blindly closing the WebView. If an account sheet is open, Back closes that sheet first. From a secondary screen it returns through the app's view history. Only when the user is already at Home does the native Back action exit the app.
 
+## Install and offline behavior
+
+Masinloc Connect ships local install metadata and an app-shell service worker for the web/PWA build. The install experience must not depend on a remote website icon being available.
+
+Canonical public content uses a network-first strategy. A successful website/repository response may be cached locally. If both canonical network sources are later unavailable, previously opened cached content may be used. This applies to public editorial/reference datasets such as Sambal Tina, Discover, History, Marketplace and Community Bulletin data.
+
+Operational data is different. Account synchronization, live jobs, emergency delivery/status refresh and other live backend actions still require connectivity. When the device is offline, the app shows an explicit offline state rather than implying those services are current.
+
+## Notifications
+
+Notifications currently provide an in-app destination. Device push permission is intentionally not requested until production push delivery and device-token registration are connected. Do not add a permission prompt merely because a notification screen exists.
+
 ## Jobs flow
 
 Jobs & Opportunities supports search, category filters, location/work filters, live Supabase opportunity data, provider attribution, saved jobs, Signature Resume, My Applications and external application links.
@@ -68,15 +80,32 @@ More Services contains Submit Masinloc History, Submit a Sambal Tina Word, My Su
 
 PNP / MDRRMO reporting remains available without an account. A report can capture GPS, work offline and retry when connectivity returns. While an unsent report is queued, the incident payload remains on the current device because the app needs it to complete delivery.
 
+GPS is optional. A resident can supply barangay or landmark instead. Native Android packages declare foreground coarse/fine location access; iOS packages include a When-In-Use purpose string. Masinloc Connect does not request background location for Help Desk.
+
 A network request marked `sending` is never trusted across an app restart. The persistent device copy is stored/recovered as `queued` until the emergency service explicitly confirms receipt, so a terminated app cannot strand a report in a false in-flight state. The user is given a Retry action when connectivity is available.
 
 Once the emergency service confirms delivery, persistent device storage is minimized automatically. Description, GPS coordinates, reporter name, reporter contact details and precise location fields are removed. The device retains only the report identifier/secret required for status lookup, public reference, delivery/status timestamps, agency, incident type and a minimal location summary. Responder messages are fetched for the current session and are not retained in persistent device storage.
 
 A report is never shown as `received` until the emergency service confirms delivery.
 
+## Accessibility behavior
+
+- Keyboard users can skip directly to main content.
+- Interactive controls show a visible focus state.
+- Main content receives focus when the active app view changes.
+- Connectivity and loading states expose status semantics for assistive technology.
+- Reduced-motion preferences suppress nonessential motion.
+- Search and other icon-led controls require accessible labels.
+
 ## Performance and loading
 
 Home and first-run UI remain in the initial bundle. Secondary product screens are lazy-loaded on demand so opening Masinloc Connect does not download every feature before the user needs it.
+
+## Release gates
+
+A release candidate should not be treated as ready merely because Vite builds. CI must also cover dependency audit, PWA/install packaging, browser interaction regressions, native auth configuration, native Help Desk location metadata, branded/native asset generation where safely supported, and Android/iOS compilation.
+
+Release dependencies should be locked and installed reproducibly. A committed package lock plus `npm ci` is preferred once the dependency graph is finalized.
 
 ## Data integrity rules
 
@@ -86,5 +115,7 @@ Home and first-run UI remain in the initial bundle. Secondary product screens ar
 - Recover interrupted emergency sends as queued, never received or permanently sending.
 - Reuse verified public data where appropriate without copying the website experience.
 - Do not present generic text-to-speech as verified Tina Sambal pronunciation.
+- Do not request push-notification permission before real push delivery exists.
+- Do not request background location for the current Help Desk flow.
 - Website = public source / long-form layer.
 - Mobile app = action / utility layer.
