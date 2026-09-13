@@ -96,10 +96,10 @@ Release UI includes keyboard focus visibility, a skip-to-content link, view-chan
 
 ## Build and validation
 
-The application is React + Vite with Capacitor packaging for iOS and Android.
+The application is React + Vite with Capacitor packaging for iOS and Android. Release dependencies are committed in `package-lock.json`; CI and native checks use reproducible installs.
 
 ```bash
-npm install
+npm ci
 npm audit --audit-level=high
 npm run build
 npm run check:release
@@ -108,4 +108,4 @@ npm run test:e2e
 
 `npm run build` generates the PWA resources from `assets/logo.svg` before the Vite production build. Native Android/iOS resource generation is exercised by the Native App Check workflow together with auth-scheme, Help Desk location-permission and platform compile checks.
 
-The repository should use a committed `package-lock.json` and `npm ci` in CI once the dependency graph is finalized; do not intentionally return to floating release installs.
+Do not replace `npm ci` with a floating release install or remove the committed lockfile without intentionally regenerating and revalidating the dependency graph.
