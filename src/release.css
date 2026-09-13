@@ -1,3 +1,4 @@
+.sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 .skip-link{position:fixed;top:10px;left:10px;z-index:10000;transform:translateY(-150%);background:#fff;color:#03112f;border:2px solid #0d6de7;border-radius:10px;padding:10px 14px;font-weight:800;box-shadow:0 6px 22px rgba(3,17,47,.16)}
 .skip-link:focus{transform:translateY(0)}
 .connectivity-banner{position:sticky;top:0;z-index:900;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;background:#fff3df;color:#6f481f;border-bottom:1px solid #efd5ac;padding:9px 14px;text-align:center;font-size:12px;line-height:1.35}
