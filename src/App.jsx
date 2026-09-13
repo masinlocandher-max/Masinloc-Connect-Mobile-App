@@ -91,7 +91,7 @@ export default function App() {
     setAuthPrompt({ reason, destination }); return false;
   }, [user]);
 
-  const goBack = () => {
+  const goBack = useCallback(() => {
     setViewHistory((items) => {
       const next = [...items];
       const previous = next.pop() || 'home';
@@ -99,7 +99,19 @@ export default function App() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return next;
     });
-  };
+  }, []);
+
+  const handleNativeBack = useCallback(() => {
+    if (authPrompt) {
+      setAuthPrompt(null);
+      return true;
+    }
+    if (view !== 'home') {
+      goBack();
+      return true;
+    }
+    return false;
+  }, [authPrompt, goBack, view]);
 
   const navigate = (next) => {
     if (next === '__back') return goBack();
@@ -139,7 +151,7 @@ export default function App() {
   };
 
   return <div className="app-frame app-frame-v2">
-    <NativeAuthBridge />
+    <NativeAuthBridge onBack={handleNativeBack} />
     {authError ? <div className="native-auth-error" role="alert"><span>{authError}</span><button type="button" onClick={() => setAuthError('')}>Dismiss</button></div> : null}
     <div className={`app-shell${immersive ? ' immersive-shell' : ''}`}>
       {view === 'home' || immersive ? null : <ScreenTopBar onBack={goBack} onHome={() => navigate('home')} />}
