@@ -13,7 +13,11 @@ import {
 function loadPersistedReport() {
   try {
     const current = JSON.parse(localStorage.getItem(storageKey) || 'null');
-    if (current) return current;
+    if (current) {
+      const normalized = prepareReportForStorage(current);
+      localStorage.setItem(storageKey, JSON.stringify(normalized));
+      return normalized;
+    }
 
     const legacy = JSON.parse(localStorage.getItem(legacyReportStorageKey) || 'null');
     if (!legacy) return null;
