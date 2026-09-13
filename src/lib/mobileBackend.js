@@ -83,15 +83,3 @@ export async function confirmApplicationApplied(userId, activityId) {
   if (error) throw error;
   return data;
 }
-
-export async function getBuyerOrders(userId) {
-  if (!userId) return [];
-  const { data, error } = await supabase
-    .from('pos_orders')
-    .select('id,order_number,status,payment_status,total,fulfillment,customer_name,tracking_token,created_at,updated_at')
-    .eq('buyer_user_id', userId)
-    .order('created_at', { ascending: false })
-    .limit(100);
-  if (error) throw error;
-  return data || [];
-}
