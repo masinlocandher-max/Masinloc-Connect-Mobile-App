@@ -24,13 +24,14 @@ jobs:
           java-version: '21'
       - run: npm install
       - run: npm run build
-      - name: Generate Android project
-        run: npx cap add android && npx cap sync android && npm run native:configure
-      - name: Verify Android auth and location configuration
+      - name: Generate Android project and branded assets
+        run: npx cap add android && npm run assets:android && npx cap sync android && npm run native:configure
+      - name: Verify Android auth, location and app assets
         run: |
           grep -q 'android:scheme="com.masinloc.connect"' android/app/src/main/AndroidManifest.xml
           grep -q 'android.permission.ACCESS_COARSE_LOCATION' android/app/src/main/AndroidManifest.xml
           grep -q 'android.permission.ACCESS_FINE_LOCATION' android/app/src/main/AndroidManifest.xml
+          test -f android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
       - name: Compile Android debug APK
         run: cd android && ./gradlew assembleDebug
 
@@ -44,12 +45,13 @@ jobs:
           node-version: 22
       - run: npm install
       - run: npm run build
-      - name: Generate iOS project
-        run: npx cap add ios && npx cap sync ios && npm run native:configure
-      - name: Verify iOS auth and location configuration
+      - name: Generate iOS project and branded assets
+        run: npx cap add ios && npm run assets:ios && npx cap sync ios && npm run native:configure
+      - name: Verify iOS auth, location and app assets
         run: |
           grep -q '<string>com.masinloc.connect</string>' ios/App/App/Info.plist
           grep -q '<key>NSLocationWhenInUseUsageDescription</key>' ios/App/App/Info.plist
           grep -q 'Masinloc Connect uses your location only when you choose Use GPS in Help Desk' ios/App/App/Info.plist
+          test -f ios/App/App/Assets.xcassets/AppIcon.appiconset/AppIcon-512@2x.png
       - name: Compile iOS simulator build
         run: xcodebuild -project ios/App/App.xcodeproj -scheme App -sdk iphonesimulator -configuration Debug CODE_SIGNING_ALLOWED=NO build
