@@ -10,15 +10,7 @@ const dictionary = {
 
 const marketplace = {
   categories: [{ id: 'food-drinks', label: 'Food & Drinks' }],
-  businesses: [{
-    slug: 'sample-cafe',
-    name: 'Sample Cafe',
-    category: 'food-drinks',
-    location: 'Masinloc, Zambales',
-    description: 'A reviewed local business used only by the automated smoke test.',
-    descriptor: 'Cafe',
-    facebook: 'https://www.facebook.com/',
-  }],
+  businesses: [{ slug: 'sample-cafe', name: 'Sample Cafe', category: 'food-drinks', location: 'Masinloc, Zambales', description: 'A reviewed local business used only by the automated smoke test.', descriptor: 'Cafe', facebook: 'https://www.facebook.com/' }],
 };
 
 const discover = { section: { name: 'Discover Masinloc', intro: 'Places, food, culture and stories from Masinloc.' }, themes: [], articles: [] };
@@ -52,7 +44,7 @@ test('first-run guest flow reaches the mobile home', async ({ page }, testInfo) 
   await enterAsGuest(page);
   await expect(page.getByText('Jobs & Opportunities', { exact: true }).first()).toBeVisible();
   await expect(page.getByText('Marketplace', { exact: true }).first()).toBeVisible();
-  await expect(page.getByText('More Services', { exact: true }).first()).toBeVisible();
+  await expect(page.getByText('For Business Owners', { exact: true }).first()).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath('home.png'), fullPage: false });
 });
 
@@ -62,6 +54,7 @@ test('Sambal Tina opens as a mobile-native dictionary', async ({ page }, testInf
   await expect(page.getByRole('heading', { name: 'Sambal Tina' })).toBeVisible();
   await expect(page.getByPlaceholder(/Search a Tina word/)).toBeVisible();
   await expect(page.getByRole('heading', { name: 'abagat' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /Hear abagat/i })).toHaveCount(0);
   await page.screenshot({ path: testInfo.outputPath('dictionary.png'), fullPage: false });
 });
 
@@ -86,4 +79,25 @@ test('Marketplace and community contribution screens are reachable', async ({ pa
   await page.getByText('Submit Masinloc History', { exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Submit Masinloc History' })).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath('contribution.png'), fullPage: false });
+});
+
+test('guest Saved screen remains usable without forced sign-in', async ({ page }, testInfo) => {
+  await enterAsGuest(page);
+  await page.getByLabel('Saved', { exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Saved' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Device saves are available without an account' })).toBeVisible();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await page.screenshot({ path: testInfo.outputPath('saved-guest.png'), fullPage: false });
+});
+
+test('business-owner flow does not expose unfinished POS or order controls', async ({ page }, testInfo) => {
+  await enterAsGuest(page);
+  await page.getByText('For Business Owners', { exact: true }).first().click();
+  await expect(page.getByRole('heading', { name: 'For Business Owners' })).toBeVisible();
+  await expect(page.getByText('Masinloc POS is a separate product')).toBeVisible();
+  await expect(page.getByText('Marketplace Orders', { exact: true })).toHaveCount(0);
+  await expect(page.getByText('Access Masinloc POS', { exact: true })).toHaveCount(0);
+  await page.getByRole('button', { name: /Add My Business to Marketplace/i }).click();
+  await expect(page.getByRole('heading', { name: 'Add Your Business' })).toBeVisible();
+  await page.screenshot({ path: testInfo.outputPath('business-owner.png'), fullPage: false });
 });
