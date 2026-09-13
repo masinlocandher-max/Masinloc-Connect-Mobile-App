@@ -26,6 +26,14 @@ async function stubPublicData(page) {
   await page.route('**/data/bulletin.json', (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(bulletin) }));
   await page.route('**/rest/v1/external_jobs**', (route) => route.fulfill({ status: 200, contentType: 'application/json', headers: { 'content-range': '0-0/1' }, body: JSON.stringify([{ id: '11111111-1111-4111-8111-111111111111', provider_id: '22222222-2222-4222-8222-222222222222', title: 'Customer Service Representative', company: 'Sample Employer', location: 'Masinloc, Zambales', work_setup: 'On-site', employment_type: 'Full-time', salary_text: 'Competitive', published_at: new Date().toISOString(), closing_date: null, apply_url: 'https://example.com/apply', verification_status: 'verified' }]) }));
   await page.route('**/rest/v1/job_providers**', (route) => route.fulfill({ status: 200, contentType: 'application/json', headers: { 'content-range': '0-0/1' }, body: JSON.stringify([{ id: '22222222-2222-4222-8222-222222222222', name: 'Sample Provider', attribution_label: 'Trusted Job Provider', status: 'active' }]) }));
+  await page.route('**/functions/v1/emergency-response', async (route) => {
+    const request = route.request();
+    const payload = request.postDataJSON();
+    if (payload?.action === 'status') {
+      return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok:true, incident:{ status:'received', public_reference:'MC-TEST-001', received_at:'2026-09-13T11:00:00Z' }, messages:[] }) });
+    }
+    return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok:true, status:'received', reference:'MC-TEST-001', received_at:'2026-09-13T11:00:00Z' }) });
+  });
 }
 
 async function enterAsGuest(page) {
@@ -100,4 +108,33 @@ test('business-owner flow does not expose unfinished POS or order controls', asy
   await page.getByRole('button', { name: /Add My Business to Marketplace/i }).click();
   await expect(page.getByRole('heading', { name: 'Add Your Business' })).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath('business-owner.png'), fullPage: false });
+});
+
+test('Help Desk minimizes sensitive device data after confirmed delivery', async ({ page }, testInfo) => {
+  await enterAsGuest(page);
+  await page.getByText('Help Desk', { exact: true }).first().click();
+  await expect(page.getByRole('heading', { name: 'Help Desk' })).toBeVisible();
+  await page.getByRole('button', { name: /PNP Police and public safety/i }).click();
+  await page.getByLabel('Incident type').selectOption('crime');
+  await page.getByLabel('What is happening?').fill('Smoke-test incident details that should not remain after delivery.');
+  await page.getByLabel('Barangay').fill('North Poblacion');
+  await page.getByText('Optional contact details').click();
+  await page.getByLabel('Name', { exact:true }).fill('Private Reporter');
+  await page.getByLabel('Phone or email').fill('09170000000');
+  await page.getByRole('button', { name: 'Send report' }).click();
+  await expect(page.getByText('MC-TEST-001')).toBeVisible();
+
+  const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('masinloc-connect-active-report-v2')));
+  expect(stored.sync_state).toBe('delivered');
+  expect(stored.status).toBe('received');
+  expect(stored.reference).toBe('MC-TEST-001');
+  expect(stored.location_summary).toBe('North Poblacion');
+  expect(stored.report_secret).toBeTruthy();
+  expect(stored.description).toBeUndefined();
+  expect(stored.reporter_name).toBeUndefined();
+  expect(stored.reporter_contact).toBeUndefined();
+  expect(stored.barangay).toBeUndefined();
+  expect(stored.latitude).toBeUndefined();
+  expect(stored.longitude).toBeUndefined();
+  await page.screenshot({ path: testInfo.outputPath('helpdesk-delivered.png'), fullPage: false });
 });
