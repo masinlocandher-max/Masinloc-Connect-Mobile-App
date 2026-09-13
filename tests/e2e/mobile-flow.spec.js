@@ -170,7 +170,7 @@ test('release shell exposes keyboard navigation and accurate push-notification s
   await enterAsGuest(page);
   const skip = page.getByRole('link', { name: 'Skip to main content' });
   await expect(skip).toHaveAttribute('href', '#main-content');
-  await page.getByRole('button', { name: 'Notifications', exact: true }).click();
+  await page.getByRole('navigation', { name: 'Primary navigation' }).getByRole('button', { name: 'Notifications', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Notifications', exact: true })).toBeVisible();
   await expect(page.getByText('Device push alerts are not enabled yet')).toBeVisible();
   await expect(page.getByText(/will not ask for notification permission/i)).toBeVisible();
