@@ -27,6 +27,8 @@ See [`docs/SOURCE_OF_TRUTH.md`](docs/SOURCE_OF_TRUTH.md) for the binding archite
 8. Marketplace currently provides reviewed business discovery plus a business-listing review workflow. Customer ordering and seller order management are not connected yet.
 9. Masinloc POS is a separate product/repository. It must not appear as a working Masinloc Connect feature until a real production integration exists.
 10. Sambal Tina pronunciation/audio must use a verified language-specific source. Generic Filipino device text-to-speech must not be presented as Tina Sambal pronunciation.
+11. Device permissions are requested only when a connected feature genuinely needs them. Help Desk location is foreground-only and optional; push-notification permission is not requested until production push delivery exists.
+12. Release builds must pass dependency audit, release-packaging checks, browser regression tests and native Android/iOS compilation.
 
 ## Primary navigation
 
@@ -66,6 +68,44 @@ The business-owner flow currently supports:
 
 Private owner-review fields may be retained while a draft is intentionally saved, but after a successful submission the saved submission snapshot keeps only public listing details and the review reference.
 
-## Build
+## Offline and install behavior
 
-The application is built as a React + Vite mobile-first product, with Capacitor-ready structure for iOS and Android packaging.
+- The web build ships a local manifest and local install icon rather than depending on the public website for install metadata.
+- A production service worker caches the app shell for installed-web startup.
+- Canonical public data that the user has already opened can be retained in Cache Storage and used when both the website and canonical repository are unreachable.
+- Live account sync, live jobs, emergency delivery/status refresh and other operational services still require connectivity.
+- An offline banner communicates that distinction instead of implying that every feature works offline.
+
+## Help Desk release rules
+
+- PNP/MDRRMO reporting remains available without an account.
+- GPS is optional; barangay or landmark can be entered instead.
+- Native Android builds declare coarse/fine foreground location permission and iOS builds include a When-In-Use location purpose string.
+- No background location permission is requested.
+- Unsent report details stay on-device only as needed for retry.
+- After confirmed delivery, persistent device data is minimized to tracking information and a minimal incident/location summary.
+- A report interrupted while sending recovers as queued, never as falsely received.
+
+## Notifications
+
+The Notifications destination supports in-app updates. Masinloc Connect intentionally does **not** request device push permission until a real production push-delivery and device-token registration path is connected.
+
+## Accessibility
+
+Release UI includes keyboard focus visibility, a skip-to-content link, view-change focus management, reduced-motion support, status announcements and semantic labels for key controls and connectivity states.
+
+## Build and validation
+
+The application is React + Vite with Capacitor packaging for iOS and Android.
+
+```bash
+npm install
+npm audit --audit-level=high
+npm run build
+npm run check:release
+npm run test:e2e
+```
+
+`npm run build` generates the PWA resources from `assets/logo.svg` before the Vite production build. Native Android/iOS resource generation is exercised by the Native App Check workflow together with auth-scheme, Help Desk location-permission and platform compile checks.
+
+The repository should use a committed `package-lock.json` and `npm ci` in CI once the dependency graph is finalized; do not intentionally return to floating release installs.
