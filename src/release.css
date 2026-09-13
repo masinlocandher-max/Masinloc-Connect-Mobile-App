@@ -1,0 +1,9 @@
+.skip-link{position:fixed;top:10px;left:10px;z-index:10000;transform:translateY(-150%);background:#fff;color:#03112f;border:2px solid #0d6de7;border-radius:10px;padding:10px 14px;font-weight:800;box-shadow:0 6px 22px rgba(3,17,47,.16)}
+.skip-link:focus{transform:translateY(0)}
+.connectivity-banner{position:sticky;top:0;z-index:900;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;background:#fff3df;color:#6f481f;border-bottom:1px solid #efd5ac;padding:9px 14px;text-align:center;font-size:12px;line-height:1.35}
+.connectivity-banner strong{font-size:12px}.connectivity-banner span{color:#805d34}
+#main-content:focus{outline:none}
+:where(button,a,input,select,textarea,summary,[tabindex]):focus-visible{outline:3px solid rgba(13,109,231,.42);outline-offset:3px}
+[aria-disabled="true"],button:disabled{cursor:not-allowed}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
+@media (max-width:520px){.connectivity-banner{justify-content:flex-start;text-align:left;padding-inline:12px}}
