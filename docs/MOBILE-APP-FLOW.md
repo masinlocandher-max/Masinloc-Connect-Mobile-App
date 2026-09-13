@@ -28,6 +28,10 @@ Public browsing remains available without an account. Account prompts are reserv
 - More Services
 - Help Desk
 
+## Native navigation behavior
+
+Android hardware Back participates in Masinloc Connect navigation rather than blindly closing the WebView. If an account sheet is open, Back closes that sheet first. From a secondary screen it returns through the app's view history. Only when the user is already at Home does the native Back action exit the app.
+
 ## Jobs flow
 
 Jobs & Opportunities supports search, category filters, location/work filters, live Supabase opportunity data, provider attribution, saved jobs, Signature Resume, My Applications and external application links.
@@ -64,6 +68,8 @@ More Services contains Submit Masinloc History, Submit a Sambal Tina Word, My Su
 
 PNP / MDRRMO reporting remains available without an account. A report can capture GPS, work offline and retry when connectivity returns. While an unsent report is queued, the incident payload remains on the current device because the app needs it to complete delivery.
 
+A network request marked `sending` is never trusted across an app restart. The persistent device copy is stored/recovered as `queued` until the emergency service explicitly confirms receipt, so a terminated app cannot strand a report in a false in-flight state. The user is given a Retry action when connectivity is available.
+
 Once the emergency service confirms delivery, persistent device storage is minimized automatically. Description, GPS coordinates, reporter name, reporter contact details and precise location fields are removed. The device retains only the report identifier/secret required for status lookup, public reference, delivery/status timestamps, agency, incident type and a minimal location summary. Responder messages are fetched for the current session and are not retained in persistent device storage.
 
 A report is never shown as `received` until the emergency service confirms delivery.
@@ -77,6 +83,7 @@ Home and first-run UI remain in the initial bundle. Secondary product screens ar
 - Do not invent job listings, applications, products, orders, emergency delivery, moderation status or publication status.
 - Do not expose POS/order UI merely because a separate repository or future backend exists.
 - Let Supabase RLS define public operational job/provider visibility rather than duplicating mutable status rules in the client.
+- Recover interrupted emergency sends as queued, never received or permanently sending.
 - Reuse verified public data where appropriate without copying the website experience.
 - Do not present generic text-to-speech as verified Tina Sambal pronunciation.
 - Website = public source / long-form layer.
