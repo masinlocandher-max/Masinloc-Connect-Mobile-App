@@ -1,18 +1,9 @@
 import { useMemo, useState } from 'react';
-import { ArrowLeft, Heart, Search, Volume2 } from 'lucide-react';
+import { ArrowLeft, Heart, Search } from 'lucide-react';
 import useCanonicalData from '../hooks/useCanonicalData.js';
 import { AsyncState, EmptyState } from '../components/UI.jsx';
 
 const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-
-function speakWord(word) {
-  if (!('speechSynthesis' in window) || !word) return;
-  window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(word);
-  utterance.lang = 'fil-PH';
-  utterance.rate = 0.82;
-  window.speechSynthesis.speak(utterance);
-}
 
 export default function DictionaryShowcase({ navigate }) {
   const source = useCanonicalData('dictionary');
@@ -72,8 +63,7 @@ export default function DictionaryShowcase({ navigate }) {
             {entry.fil ? <p className="dictionary-filipino">Pilipino: <em>{entry.fil}</em></p> : null}
           </div>
           <div className="dictionary-actions">
-            <button className="dictionary-audio" type="button" onClick={() => speakWord(entry.tina)} aria-label={`Hear ${entry.tina}`}><Volume2 size={19} /></button>
-            <button className={`dictionary-save${isSaved ? ' saved' : ''}`} type="button" onClick={() => toggleSaved(entry.tina)} aria-label={`Save ${entry.tina}`}><Heart size={20} fill={isSaved ? 'currentColor' : 'none'} /></button>
+            <button className={`dictionary-save${isSaved ? ' saved' : ''}`} type="button" onClick={() => toggleSaved(entry.tina)} aria-label={`${isSaved ? 'Remove' : 'Save'} ${entry.tina}`}><Heart size={20} fill={isSaved ? 'currentColor' : 'none'} /></button>
           </div>
         </article>;
       })}</div> : <EmptyState icon={Search} title="No matching word" body="Try another spelling or search in English or Filipino." /> : null}
