@@ -88,7 +88,7 @@ export default function JobsShowcase({ user, requireAccount, navigate }) {
       <div className="showcase-hero-fade" aria-hidden="true" />
       <div className="showcase-hero-top">
         <button className="showcase-back" type="button" onClick={() => navigate('home')} aria-label="Back"><ArrowLeft size={22} /></button>
-        <img className="showcase-logo" src="/assets/masinloc-connect-logo.webp" alt="Masinloc Connect" />
+        <img className="showcase-logo" src="/assets/masinloc-connect-brand.svg" alt="Masinloc Connect" />
       </div>
       <div className="showcase-script jobs-script">Masinloqueños can go further.<span /></div>
       <div className="jobs-hero-copy"><p className="jobs-kicker">SKILLED PEOPLE. STRONGER MASINLOC.</p><h1>Jobs &amp; Opportunities</h1><p>Find work, scholarships and verified opportunities.</p></div>
