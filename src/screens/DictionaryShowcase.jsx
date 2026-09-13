@@ -41,7 +41,7 @@ export default function DictionaryShowcase({ navigate }) {
       <div className="showcase-hero-fade" aria-hidden="true" />
       <div className="showcase-hero-top">
         <button className="showcase-back" type="button" onClick={() => navigate('home')} aria-label="Back"><ArrowLeft size={22} /></button>
-        <img className="showcase-logo" src="/assets/masinloc-connect-logo.webp" alt="Masinloc Connect" />
+        <img className="showcase-logo" src="/assets/masinloc-connect-brand.svg" alt="Masinloc Connect" />
       </div>
       <div className="showcase-script dictionary-script">Our words. Our stories. Our Masinloc.<span /></div>
       <div className="dictionary-hero-copy"><h1>Sambal Tina</h1><p>A living dictionary of our words, stories and identity.</p></div>
