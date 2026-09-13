@@ -5,14 +5,18 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prebuild": "npm run assets:pwa",
     "build": "vite build",
     "preview": "vite preview",
     "test:e2e": "playwright test",
     "test:e2e:mobile": "playwright test --project=mobile",
+    "assets:pwa": "capacitor-assets generate --pwa --iconBackgroundColor '#03112F' --iconBackgroundColorDark '#03112F' --splashBackgroundColor '#F6F8FB' --splashBackgroundColorDark '#03112F'",
+    "assets:android": "capacitor-assets generate --android --iconBackgroundColor '#03112F' --iconBackgroundColorDark '#03112F' --splashBackgroundColor '#F6F8FB' --splashBackgroundColorDark '#03112F'",
+    "assets:ios": "capacitor-assets generate --ios --iconBackgroundColor '#03112F' --iconBackgroundColorDark '#03112F' --splashBackgroundColor '#F6F8FB' --splashBackgroundColorDark '#03112F'",
     "native:configure": "node scripts/configure-native-auth.mjs",
     "cap:sync": "npm run build && cap sync && npm run native:configure",
-    "cap:ios": "npm run build && cap sync ios && npm run native:configure && cap open ios",
-    "cap:android": "npm run build && cap sync android && npm run native:configure && cap open android"
+    "cap:ios": "npm run build && cap sync ios && npm run assets:ios && npm run native:configure && cap open ios",
+    "cap:android": "npm run build && cap sync android && npm run assets:android && npm run native:configure && cap open android"
   },
   "dependencies": {
     "@capacitor/app": "^8.0.0",
@@ -24,6 +28,7 @@
   },
   "devDependencies": {
     "@capacitor/android": "^8.5.0",
+    "@capacitor/assets": "3.0.14",
     "@capacitor/cli": "^8.5.0",
     "@capacitor/ios": "^8.5.0",
     "@playwright/test": "^1.55.0",
