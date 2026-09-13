@@ -11,7 +11,7 @@ on:
       - main
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build-and-smoke:
@@ -29,12 +29,18 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Upload generated dependency lock
-        uses: actions/upload-artifact@v4
-        with:
-          name: package-lock-candidate
-          path: package-lock.json
-          retention-days: 1
+      - name: Commit generated dependency lock on agent branch
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/agent/')
+        run: |
+          if git ls-files --error-unmatch package-lock.json >/dev/null 2>&1; then
+            echo 'package-lock.json is already committed.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add package-lock.json
+          git commit -m 'Lock release dependencies'
+          git push origin HEAD:${GITHUB_REF_NAME}
 
       - name: Audit dependencies for high-severity issues
         run: npm audit --audit-level=high
