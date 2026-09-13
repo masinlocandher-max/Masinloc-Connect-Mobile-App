@@ -29,6 +29,7 @@ See [`docs/SOURCE_OF_TRUTH.md`](docs/SOURCE_OF_TRUTH.md) for the binding archite
 10. Sambal Tina pronunciation/audio must use a verified language-specific source. Generic Filipino device text-to-speech must not be presented as Tina Sambal pronunciation.
 11. Device permissions are requested only when a connected feature genuinely needs them. Help Desk location is foreground-only and optional; push-notification permission is not requested until production push delivery exists.
 12. Release builds must pass dependency audit, release-packaging checks, browser regression tests and native Android/iOS compilation.
+13. The approved presentation system is a light iOS-inspired Masinloc Connect interface: multicolor Masinloc Connect brand, soft blue/white backgrounds, translucent glass surfaces, rounded service modules, restrained gradients and shadows, a prominent Help Desk action, and a floating translucent mobile dock. Security or architecture hardening must not replace this product identity with a generic utility UI.
 
 ## Primary navigation
 
@@ -96,7 +97,7 @@ Release UI includes keyboard focus visibility, a skip-to-content link, view-chan
 
 ## Build and validation
 
-The application is React + Vite with Capacitor packaging for iOS and Android. Release dependencies are committed in `package-lock.json`; CI and native checks use reproducible installs.
+The application is React + Vite with Capacitor packaging for iOS and Android.
 
 ```bash
 npm ci
@@ -108,4 +109,4 @@ npm run test:e2e
 
 `npm run build` generates the PWA resources from `assets/logo.svg` before the Vite production build. Native Android/iOS resource generation is exercised by the Native App Check workflow together with auth-scheme, Help Desk location-permission and platform compile checks.
 
-Do not replace `npm ci` with a floating release install or remove the committed lockfile without intentionally regenerating and revalidating the dependency graph.
+The committed `package-lock.json` is the release dependency contract. CI uses `npm ci`; do not intentionally return release validation to floating dependency installs.
