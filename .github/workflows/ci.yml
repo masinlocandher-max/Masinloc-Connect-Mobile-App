@@ -29,6 +29,13 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Upload generated dependency lock
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-lock-candidate
+          path: package-lock.json
+          retention-days: 1
+
       - name: Audit dependencies for high-severity issues
         run: npm audit --audit-level=high
 
