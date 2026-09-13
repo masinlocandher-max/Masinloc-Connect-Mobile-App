@@ -50,6 +50,7 @@ export async function getLiveJobs() {
   const { data, error } = await supabase
     .from('external_jobs')
     .select('id,provider_id,title,company,location,work_setup,employment_type,salary_text,description_excerpt,requirements_excerpt,published_at,closing_date,apply_url,verification_status')
+    .eq('verification_status', 'verified')
     .order('published_at', { ascending: false })
     .limit(80);
   if (error) throw error;
@@ -60,6 +61,7 @@ export async function getJobProviders() {
   const { data, error } = await supabase
     .from('job_providers')
     .select('id,name,attribution_label,homepage_url,public_note,status')
+    .eq('status', 'active')
     .order('name');
   if (error) throw error;
   return data || [];
@@ -81,8 +83,13 @@ export async function sendEmailSignIn(email) {
 }
 
 export async function handleNativeAuthCallback(url) {
-  if (!url || !url.startsWith(NATIVE_AUTH_REDIRECT)) return false;
+  if (!url) return false;
   const parsed = new URL(url);
+  const expected = new URL(NATIVE_AUTH_REDIRECT);
+  const matchesRedirect = parsed.protocol === expected.protocol
+    && parsed.hostname === expected.hostname
+    && parsed.pathname === expected.pathname;
+  if (!matchesRedirect) return false;
   const callbackError = parsed.searchParams.get('error_description') || parsed.searchParams.get('error');
   if (callbackError) throw new Error(callbackError);
   const code = parsed.searchParams.get('code');
