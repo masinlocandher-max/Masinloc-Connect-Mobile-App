@@ -15,7 +15,6 @@ import SellerHub, { SellerGuidelinesScreen } from './screens/SellerHubLive.jsx';
 import { SignatureResumeScreen } from './screens/ActionScreens.jsx';
 import ApplicationsScreen from './screens/ApplicationsLive.jsx';
 import { ContributionScreen, MySubmissionsScreen } from './screens/ContributionsLive.jsx';
-import BuyerOrdersScreen from './screens/BuyerOrdersScreen.jsx';
 import { BulletinScreen, DictionaryScreen, DiscoverScreen, HistoryScreen } from './screens/ContentScreens.jsx';
 import { AboutScreen, ContactScreen, PoliciesScreen, ProfileScreen } from './screens/UtilityScreens.jsx';
 
@@ -91,8 +90,6 @@ export default function App() {
   const navigate = (next) => {
     if (next === '__back') return goBack();
     if ((next === 'profile' || next === 'resume') && !user) return requireAccount(next === 'resume' ? 'create and manage your Signature Resume' : 'open your profile and account settings', next);
-    if (next === 'saved' && !user) return requireAccount('view your saved jobs and content', 'saved');
-    if ((next === 'orders' || next === 'tracking') && !user) return requireAccount('view your orders and delivery status', next);
     if (next !== view) setViewHistory((items) => [...items, view].slice(-20));
     setView(next);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -118,8 +115,6 @@ export default function App() {
     'my-submissions': <MySubmissionsScreen navigate={navigate} />,
     'suggest-correction': <ContributionScreen mode="suggest-correction" />,
     bulletin: <BulletinScreen />,
-    orders: <BuyerOrdersScreen mode="orders" user={user} />,
-    tracking: <BuyerOrdersScreen mode="tracking" user={user} />,
     sellers: <SellerHub navigate={navigate} />,
     'seller-guidelines': <SellerGuidelinesScreen />,
     dictionary: <DictionaryScreen navigate={navigate} />,
