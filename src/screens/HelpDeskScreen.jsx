@@ -2,7 +2,33 @@ import { useCallback, useEffect, useState } from 'react';
 import { AlertTriangle, Check, ChevronRight, HelpCircle, LocateFixed, RefreshCw, Shield, ShieldAlert, WifiOff } from 'lucide-react';
 import { getEmergencyStatus, randomReportSecret, submitEmergencyReport } from '../lib/platform.js';
 import { ScreenTitle } from '../components/UI.jsx';
-import { incidentTypes, reportStatusCopy as statusCopy, reportStorageKey as storageKey } from '../emergencyData.js';
+import {
+  incidentTypes,
+  legacyReportStorageKey,
+  prepareReportForStorage,
+  reportStatusCopy as statusCopy,
+  reportStorageKey as storageKey,
+} from '../emergencyData.js';
+
+function loadPersistedReport() {
+  try {
+    const current = JSON.parse(localStorage.getItem(storageKey) || 'null');
+    if (current) {
+      const normalized = prepareReportForStorage(current);
+      localStorage.setItem(storageKey, JSON.stringify(normalized));
+      return normalized;
+    }
+
+    const legacy = JSON.parse(localStorage.getItem(legacyReportStorageKey) || 'null');
+    if (!legacy) return null;
+    const migrated = prepareReportForStorage(legacy);
+    localStorage.setItem(storageKey, JSON.stringify(migrated));
+    localStorage.removeItem(legacyReportStorageKey);
+    return migrated;
+  } catch {
+    return null;
+  }
+}
 
 export default function HelpDeskScreen() {
   const [agency, setAgency] = useState('');
@@ -11,9 +37,21 @@ export default function HelpDeskScreen() {
   const [locating, setLocating] = useState(false);
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState('');
-  const [active, setActive] = useState(() => { try { return JSON.parse(localStorage.getItem(storageKey) || 'null'); } catch { return null; } });
+  const [active, setActive] = useState(loadPersistedReport);
   const [form, setForm] = useState({ incident_type:'', description:'', barangay:'', landmark:'', reporter_name:'', reporter_contact:'', contact_preference:'chat' });
-  const persist = useCallback((report) => { setActive(report); localStorage.setItem(storageKey, JSON.stringify(report)); }, []);
+
+  const persist = useCallback((report) => {
+    setActive(report);
+    localStorage.setItem(storageKey, JSON.stringify(prepareReportForStorage(report)));
+    localStorage.removeItem(legacyReportStorageKey);
+  }, []);
+
+  const clearDeviceCopy = useCallback(() => {
+    localStorage.removeItem(storageKey);
+    localStorage.removeItem(legacyReportStorageKey);
+    setActive(null);
+    setMessage('');
+  }, []);
 
   const locate = useCallback(() => {
     if (!navigator.geolocation) return setMessage('GPS is not available. Enter your barangay or nearest landmark instead.');
@@ -70,15 +108,17 @@ export default function HelpDeskScreen() {
 
   if (active) {
     const copy = statusCopy[active.status] || [active.status || 'Report saved', 'Status updated.'];
-    return <div className="screen-stack mobile-native-stack helpdesk-mobile"><ScreenTitle title="Your Help Desk Report" subtitle="This report stays on this device even when you are not signed in." />
+    const locationSummary = active.location_summary || active.barangay || active.landmark || (active.latitude ? 'GPS shared' : 'Not available');
+    return <div className="screen-stack mobile-native-stack helpdesk-mobile"><ScreenTitle title="Your Help Desk Report" subtitle="You can track this report on this device without signing in." />
       <section className={active.sync_state === 'delivered' ? 'report-status-card delivered' : 'report-status-card offline'}>{active.sync_state === 'delivered' ? <Check size={25} /> : <WifiOff size={25} />}<div><span>{active.reference || 'Pending delivery'}</span><h2>{copy[0]}</h2><p>{copy[1]}</p></div></section>
-      <div className="report-facts"><div><span>Agency</span><strong>{active.target_agency?.toUpperCase()}</strong></div><div><span>Incident</span><strong>{active.incident_type?.replaceAll('_',' ')}</strong></div><div><span>Location</span><strong>{active.barangay || active.landmark || (active.latitude ? 'GPS captured' : 'Not available')}</strong></div></div>
+      <div className="report-facts"><div><span>Agency</span><strong>{active.target_agency?.toUpperCase()}</strong></div><div><span>Incident</span><strong>{active.incident_type?.replaceAll('_',' ')}</strong></div><div><span>Location</span><strong>{locationSummary}</strong></div></div>
       {active.assigned_unit ? <p className="report-assignment"><strong>Assigned unit:</strong> {active.assigned_unit}</p> : null}
       {active.messages?.length ? <div className="responder-messages"><h2>Responder messages</h2>{active.messages.map((item,index) => <p key={item.id || index}>{item.message || item.body || String(item)}</p>)}</div> : null}
+      {active.sync_state === 'delivered' ? <p className="report-privacy-note">After confirmed delivery, this device keeps only the tracking reference, status and minimal incident summary. Description, GPS coordinates and reporter contact details are removed from persistent storage. Responder messages are refreshed from the service and are not retained on-device.</p> : <p className="report-privacy-note">While this report is waiting to send, its incident details remain on this device so the app can retry delivery when a connection returns.</p>}
       {message ? <div className="form-message"><AlertTriangle size={18} />{message}</div> : null}
       <div className="button-column">{active.sync_state === 'queued' ? <button className="primary-button danger full" type="button" disabled={!navigator.onLine || sending} onClick={() => deliver(active)}>{sending ? 'Sending…' : 'Retry sending'}</button> : null}
         {active.sync_state === 'delivered' ? <button className="primary-button full" type="button" disabled={sending} onClick={refresh}><RefreshCw size={17} />{sending ? 'Refreshing…' : 'Refresh status'}</button> : null}
-        <button className="secondary-button full" type="button" onClick={() => { localStorage.removeItem(storageKey); setActive(null); setMessage(''); }}>Start another report</button></div>
+        <button className="secondary-button full" type="button" onClick={clearDeviceCopy}>Clear device copy &amp; start another report</button></div>
     </div>;
   }
 
@@ -93,7 +133,7 @@ export default function HelpDeskScreen() {
         <div className={location ? 'location-card captured' : 'location-card'}><LocateFixed size={22} /><div><strong>{location ? 'Location captured' : 'Share location'}</strong><span>{location ? `GPS accuracy ±${Math.round(location.accuracy_m)}m` : 'GPS helps responders locate you.'}</span></div><button type="button" onClick={locate} disabled={locating}>{locating ? 'Locating…' : location ? 'Refresh' : 'Use GPS'}</button></div>
         <label>Barangay<input value={form.barangay} onChange={(e) => setForm({...form,barangay:e.target.value})} placeholder="Barangay" /></label><label>Nearest landmark<input value={form.landmark} onChange={(e) => setForm({...form,landmark:e.target.value})} placeholder="Nearest landmark" /></label>
         <details><summary>Optional contact details</summary><div className="detail-fields"><label>Name<input value={form.reporter_name} onChange={(e) => setForm({...form,reporter_name:e.target.value})} /></label><label>Phone or email<input value={form.reporter_contact} onChange={(e) => setForm({...form,reporter_contact:e.target.value})} /></label><label>Preferred contact<select value={form.contact_preference} onChange={(e) => setForm({...form,contact_preference:e.target.value})}><option value="chat">In-app / report chat</option><option value="call">Call</option><option value="sms">SMS</option></select></label></div></details>
-        {message ? <div className="form-message"><AlertTriangle size={18} />{message}</div> : null}<button className="primary-button danger full" type="submit" disabled={sending}>{sending ? 'Saving report…' : navigator.onLine ? 'Send report' : 'Save report offline'}</button><p className="report-privacy-note">Your report is stored on this device first. “Received” appears only after the emergency service confirms delivery.</p></> : null}
+        {message ? <div className="form-message"><AlertTriangle size={18} />{message}</div> : null}<button className="primary-button danger full" type="submit" disabled={sending}>{sending ? 'Saving report…' : navigator.onLine ? 'Send report' : 'Save report offline'}</button><p className="report-privacy-note">If you are offline, the report stays on this device so it can be retried. After confirmed delivery, sensitive incident, contact and GPS details are removed from persistent device storage and only tracking information remains.</p></> : null}
     </form>
   </div>;
 }

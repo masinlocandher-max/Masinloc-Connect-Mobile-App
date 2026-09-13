@@ -1,4 +1,43 @@
-export const reportStorageKey = 'masinloc-connect-active-report-v1';
+export const reportStorageKey = 'masinloc-connect-active-report-v2';
+export const legacyReportStorageKey = 'masinloc-connect-active-report-v1';
+
+export function minimizeDeliveredReport(report) {
+  if (!report) return null;
+  return {
+    client_report_id: report.client_report_id,
+    report_secret: report.report_secret,
+    target_agency: report.target_agency,
+    report_mode: report.report_mode,
+    incident_type: report.incident_type,
+    sync_state: report.sync_state,
+    status: report.status,
+    reference: report.reference || null,
+    received_at: report.received_at || null,
+    acknowledged_at: report.acknowledged_at || null,
+    assigned_unit: report.assigned_unit || null,
+    resolved_at: report.resolved_at || null,
+    location_summary: report.location_summary || report.barangay || report.landmark || (report.latitude ? 'GPS shared' : 'Not available'),
+    updated_local_at: report.updated_local_at || new Date().toISOString(),
+  };
+}
+
+export function recoverInterruptedReport(report) {
+  if (!report || report.sync_state !== 'sending') return report;
+  return {
+    ...report,
+    sync_state: 'queued',
+    status: 'saved_offline',
+    last_error: 'Delivery was interrupted before confirmation. Retry sending to confirm receipt.',
+    updated_local_at: new Date().toISOString(),
+  };
+}
+
+export function prepareReportForStorage(report) {
+  if (!report) return null;
+  const recovered = recoverInterruptedReport(report);
+  return recovered.sync_state === 'delivered' ? minimizeDeliveredReport(recovered) : recovered;
+}
+
 export const reportStatusCopy = {
   saved_offline: ['Saved offline · not yet received', 'Stored on this device. PNP/MDRRMO has not received it yet.'],
   sending: ['Sending', 'A connection is available. Sending your report now.'],

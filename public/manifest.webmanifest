@@ -1,17 +1,27 @@
 {
+  "id": "/",
   "name": "Masinloc Connect",
   "short_name": "Masinloc Connect",
   "description": "Connecting Masinloqueños to the World.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
+  "orientation": "portrait-primary",
+  "background_color": "#F6F8FB",
   "theme_color": "#03112F",
+  "categories": ["community", "education", "utilities"],
   "icons": [
     {
-      "src": "https://www.masinloc-zambales.com/assets/apple-touch-icon.png",
-      "sizes": "180x180",
-      "type": "image/png",
-      "purpose": "any"
+      "src": "/assets/icons/icon-192.webp",
+      "sizes": "192x192",
+      "type": "image/webp",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/icons/icon-512.webp",
+      "sizes": "512x512",
+      "type": "image/webp",
+      "purpose": "any maskable"
     }
   ]
 }

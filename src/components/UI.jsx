@@ -4,13 +4,13 @@ import {
 import { bottomNav } from '../navigation.js';
 
 export function BrandHeader() {
-  return <header className="brand-header"><img className="connect-logo" src="/assets/masinloc-connect-logo.webp" alt="Masinloc Connect — Connecting Masinloqueños to the World" /></header>;
+  return <header className="brand-header"><img className="connect-logo" src="/assets/masinloc-connect-brand.svg" alt="Masinloc Connect — Connecting Masinloqueños to the World" /></header>;
 }
 
 export function ScreenTopBar({ onBack, onHome }) {
   return <header className="screen-topbar">
     <button className="topbar-button" type="button" onClick={onBack} aria-label="Back"><ArrowLeft size={21} /></button>
-    <button className="topbar-brand" type="button" onClick={onHome} aria-label="Masinloc Connect home"><img src="/assets/masinloc-connect-logo.webp" alt="Masinloc Connect" /></button>
+    <button className="topbar-brand" type="button" onClick={onHome} aria-label="Masinloc Connect home"><img src="/assets/masinloc-connect-brand.svg" alt="Masinloc Connect" /></button>
     <button className="topbar-button" type="button" onClick={onHome} aria-label="Home"><Home size={20} /></button>
   </header>;
 }
@@ -18,7 +18,7 @@ export function ScreenTopBar({ onBack, onHome }) {
 export function BottomNav({ active, onNavigate }) {
   return <nav className="bottom-nav bottom-nav-v2" aria-label="Primary navigation">{bottomNav.map(({ id, label, icon: Icon, brand }) =>
     <button key={id} type="button" className={`${active === id ? 'active' : ''}${brand ? ' brand-tab' : ''}`} aria-current={active === id ? 'page' : undefined} onClick={() => onNavigate(id)}>
-      {brand ? <span className="bottom-brand-mark"><img src="/assets/masinloc-connect-logo.webp" alt="" /></span> : <Icon size={23} strokeWidth={active === id ? 2.45 : 1.9} />}
+      {brand ? <span className="bottom-brand-mark"><img src="/assets/masinloc-connect-mark.svg" alt="" /></span> : <Icon size={23} strokeWidth={active === id ? 2.45 : 1.9} />}
       <span>{label}</span>
     </button>)}</nav>;
 }

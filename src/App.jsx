@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { supabase, getMemberProfile } from './lib/platform.js';
 import { bottomNav } from './navigation.js';
 import { BottomNav, ScreenTopBar } from './components/UI.jsx';
@@ -6,20 +6,33 @@ import AccountSheet from './components/AccountSheet.jsx';
 import NativeAuthBridge from './components/NativeAuthBridge.jsx';
 import JoinFlow from './screens/JoinFlow.jsx';
 import { HomeHub } from './screens/HomeMore.jsx';
-import MoreServicesScreen from './screens/MoreServicesScreen.jsx';
-import { NotificationsScreen, SavedScreen } from './screens/HomeUtilities.jsx';
-import MarketplaceScreen from './screens/MarketplaceScreen.jsx';
-import JobsScreen from './screens/JobsScreen.jsx';
-import HelpDeskScreen from './screens/HelpDeskScreen.jsx';
-import SellerHub, { SellerGuidelinesScreen } from './screens/SellerHubLive.jsx';
-import { SignatureResumeScreen } from './screens/ActionScreens.jsx';
-import ApplicationsScreen from './screens/ApplicationsLive.jsx';
-import { ContributionScreen, MySubmissionsScreen } from './screens/ContributionsLive.jsx';
-import BuyerOrdersScreen from './screens/BuyerOrdersScreen.jsx';
-import { BulletinScreen, DictionaryScreen, DiscoverScreen, HistoryScreen } from './screens/ContentScreens.jsx';
-import { AboutScreen, ContactScreen, PoliciesScreen, ProfileScreen } from './screens/UtilityScreens.jsx';
+
+const MoreServicesScreen = lazy(() => import('./screens/MoreServicesScreen.jsx'));
+const NotificationsScreen = lazy(() => import('./screens/HomeUtilities.jsx').then((module) => ({ default: module.NotificationsScreen })));
+const SavedScreen = lazy(() => import('./screens/HomeUtilities.jsx').then((module) => ({ default: module.SavedScreen })));
+const MarketplaceScreen = lazy(() => import('./screens/MarketplaceScreen.jsx'));
+const JobsScreen = lazy(() => import('./screens/JobsScreen.jsx'));
+const HelpDeskScreen = lazy(() => import('./screens/HelpDeskScreen.jsx'));
+const SellerHub = lazy(() => import('./screens/SellerHubLive.jsx'));
+const SellerGuidelinesScreen = lazy(() => import('./screens/SellerHubLive.jsx').then((module) => ({ default: module.SellerGuidelinesScreen })));
+const SignatureResumeScreen = lazy(() => import('./screens/ActionScreens.jsx').then((module) => ({ default: module.SignatureResumeScreen })));
+const ApplicationsScreen = lazy(() => import('./screens/ApplicationsLive.jsx'));
+const ContributionScreen = lazy(() => import('./screens/ContributionsLive.jsx').then((module) => ({ default: module.ContributionScreen })));
+const MySubmissionsScreen = lazy(() => import('./screens/ContributionsLive.jsx').then((module) => ({ default: module.MySubmissionsScreen })));
+const BulletinScreen = lazy(() => import('./screens/ContentScreens.jsx').then((module) => ({ default: module.BulletinScreen })));
+const DictionaryScreen = lazy(() => import('./screens/ContentScreens.jsx').then((module) => ({ default: module.DictionaryScreen })));
+const DiscoverScreen = lazy(() => import('./screens/ContentScreens.jsx').then((module) => ({ default: module.DiscoverScreen })));
+const HistoryScreen = lazy(() => import('./screens/ContentScreens.jsx').then((module) => ({ default: module.HistoryScreen })));
+const AboutScreen = lazy(() => import('./screens/UtilityScreens.jsx').then((module) => ({ default: module.AboutScreen })));
+const ContactScreen = lazy(() => import('./screens/UtilityScreens.jsx').then((module) => ({ default: module.ContactScreen })));
+const PoliciesScreen = lazy(() => import('./screens/UtilityScreens.jsx').then((module) => ({ default: module.PoliciesScreen })));
+const ProfileScreen = lazy(() => import('./screens/UtilityScreens.jsx').then((module) => ({ default: module.ProfileScreen })));
 
 const JOIN_SEEN_KEY = 'masinloc-connect-join-seen-v1';
+
+function ScreenFallback() {
+  return <div className="async-state" role="status" aria-live="polite"><strong>Loading…</strong></div>;
+}
 
 export default function App() {
   const [view, setView] = useState('home');
@@ -30,6 +43,7 @@ export default function App() {
   const [sessionReady, setSessionReady] = useState(false);
   const [showJoin, setShowJoin] = useState(false);
   const [authError, setAuthError] = useState('');
+  const [online, setOnline] = useState(() => navigator.onLine);
   const user = session?.user || null;
   const primary = bottomNav.some((item) => item.id === view);
   const activeTab = primary ? view : 'home';
@@ -65,6 +79,23 @@ export default function App() {
     return () => window.removeEventListener('masinloc-auth-error', onNativeAuthError);
   }, []);
 
+  useEffect(() => {
+    const setConnected = () => setOnline(true);
+    const setDisconnected = () => setOnline(false);
+    window.addEventListener('online', setConnected);
+    window.addEventListener('offline', setDisconnected);
+    return () => {
+      window.removeEventListener('online', setConnected);
+      window.removeEventListener('offline', setDisconnected);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!sessionReady || showJoin) return;
+    const main = document.getElementById('main-content');
+    main?.focus({ preventScroll: true });
+  }, [sessionReady, showJoin, view]);
+
   const enterApp = useCallback(() => {
     window.localStorage.setItem(JOIN_SEEN_KEY, 'yes');
     setShowJoin(false);
@@ -78,7 +109,7 @@ export default function App() {
     setAuthPrompt({ reason, destination }); return false;
   }, [user]);
 
-  const goBack = () => {
+  const goBack = useCallback(() => {
     setViewHistory((items) => {
       const next = [...items];
       const previous = next.pop() || 'home';
@@ -86,19 +117,29 @@ export default function App() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return next;
     });
-  };
+  }, []);
+
+  const handleNativeBack = useCallback(() => {
+    if (authPrompt) {
+      setAuthPrompt(null);
+      return true;
+    }
+    if (view !== 'home') {
+      goBack();
+      return true;
+    }
+    return false;
+  }, [authPrompt, goBack, view]);
 
   const navigate = (next) => {
     if (next === '__back') return goBack();
     if ((next === 'profile' || next === 'resume') && !user) return requireAccount(next === 'resume' ? 'create and manage your Signature Resume' : 'open your profile and account settings', next);
-    if (next === 'saved' && !user) return requireAccount('view your saved jobs and content', 'saved');
-    if ((next === 'orders' || next === 'tracking') && !user) return requireAccount('view your orders and delivery status', next);
     if (next !== view) setViewHistory((items) => [...items, view].slice(-20));
     setView(next);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  if (!sessionReady) return <><NativeAuthBridge /><div className="entry-loading"><img src="/assets/masinloc-connect-logo.webp" alt="Masinloc Connect" /></div></>;
+  if (!sessionReady) return <><NativeAuthBridge /><div className="entry-loading" role="status" aria-label="Loading Masinloc Connect"><img src="/assets/masinloc-connect-logo.webp" alt="Masinloc Connect" /></div></>;
   if (showJoin) return <><NativeAuthBridge /><JoinFlow user={user} onExplore={enterApp} onContinue={enterApp} /></>;
 
   const screens = {
@@ -118,8 +159,6 @@ export default function App() {
     'my-submissions': <MySubmissionsScreen navigate={navigate} />,
     'suggest-correction': <ContributionScreen mode="suggest-correction" />,
     bulletin: <BulletinScreen />,
-    orders: <BuyerOrdersScreen mode="orders" user={user} />,
-    tracking: <BuyerOrdersScreen mode="tracking" user={user} />,
     sellers: <SellerHub navigate={navigate} />,
     'seller-guidelines': <SellerGuidelinesScreen />,
     dictionary: <DictionaryScreen navigate={navigate} />,
@@ -130,11 +169,13 @@ export default function App() {
   };
 
   return <div className="app-frame app-frame-v2">
-    <NativeAuthBridge />
+    <a className="skip-link" href="#main-content">Skip to main content</a>
+    <NativeAuthBridge onBack={handleNativeBack} />
     {authError ? <div className="native-auth-error" role="alert"><span>{authError}</span><button type="button" onClick={() => setAuthError('')}>Dismiss</button></div> : null}
+    {!online ? <div className="connectivity-banner" role="status" aria-live="polite"><strong>Offline mode</strong><span>Previously opened public content may still be available. Account sync and live services need a connection.</span></div> : null}
     <div className={`app-shell${immersive ? ' immersive-shell' : ''}`}>
       {view === 'home' || immersive ? null : <ScreenTopBar onBack={goBack} onHome={() => navigate('home')} />}
-      <main className={view === 'home' ? 'screen home-root' : immersive ? 'screen showcase-screen' : 'screen'} id="main-content">{screens[view] || screens.home}</main>
+      <main className={view === 'home' ? 'screen home-root' : immersive ? 'screen showcase-screen' : 'screen'} id="main-content" tabIndex="-1"><Suspense fallback={<ScreenFallback />}>{screens[view] || screens.home}</Suspense></main>
       <BottomNav active={activeTab} onNavigate={navigate} />
     </div>
     {authPrompt ? <AccountSheet prompt={authPrompt} user={user} onClose={() => setAuthPrompt(null)} onSignedIn={() => { const destination = authPrompt.destination; setAuthPrompt(null); if (destination) navigate(destination); }} /> : null}

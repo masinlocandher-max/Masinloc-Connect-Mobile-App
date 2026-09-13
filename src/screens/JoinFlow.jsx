@@ -24,7 +24,7 @@ export default function JoinFlow({ user, onExplore, onContinue }) {
 
   if (user || step === 'success') {
     return <main className="join-flow join-success">
-      <div className="join-brand"><img src="/assets/masinloc-connect-logo.webp" alt="Masinloc Connect" /></div>
+      <div className="join-brand"><img src="/assets/masinloc-connect-brand.svg" alt="Masinloc Connect" /></div>
       <section className="join-success-card">
         <span className="join-success-icon"><CheckCircle2 size={42} /></span>
         <h1>Welcome to Masinloc Connect</h1>
@@ -37,7 +37,7 @@ export default function JoinFlow({ user, onExplore, onContinue }) {
   if (step === 'sent') {
     return <main className="join-flow join-sent">
       <button className="join-back" type="button" onClick={() => setStep('email')} aria-label="Back"><ArrowLeft size={22} /></button>
-      <div className="join-brand"><img src="/assets/masinloc-connect-logo.webp" alt="Masinloc Connect" /></div>
+      <div className="join-brand"><img src="/assets/masinloc-connect-brand.svg" alt="Masinloc Connect" /></div>
       <section className="join-panel">
         <span className="join-mail-icon"><Mail size={32} /></span>
         <h1>Check your email</h1>
@@ -51,7 +51,7 @@ export default function JoinFlow({ user, onExplore, onContinue }) {
   if (step === 'email') {
     return <main className="join-flow join-email">
       <button className="join-back" type="button" onClick={() => setStep('welcome')} aria-label="Back"><ArrowLeft size={22} /></button>
-      <div className="join-brand"><img src="/assets/masinloc-connect-logo.webp" alt="Masinloc Connect" /></div>
+      <div className="join-brand"><img src="/assets/masinloc-connect-brand.svg" alt="Masinloc Connect" /></div>
       <section className="join-panel">
         <h1>Join Masinloc Connect</h1>
         <p>Use your email to save jobs, manage your profile, track account activity and access personalized features.</p>
@@ -69,7 +69,7 @@ export default function JoinFlow({ user, onExplore, onContinue }) {
   return <main className="join-flow join-welcome">
     <div className="join-visual" aria-hidden="true" />
     <div className="join-welcome-content">
-      <div className="join-brand"><img src="/assets/masinloc-connect-logo.webp" alt="Masinloc Connect" /></div>
+      <div className="join-brand"><img src="/assets/masinloc-connect-brand.svg" alt="Masinloc Connect" /></div>
       <div className="join-copy">
         <h1>Masinloc, in your pocket.</h1>
         <p>Discover local services, find opportunities, support businesses, learn Sambal Tina and reach community help in one mobile app.</p>

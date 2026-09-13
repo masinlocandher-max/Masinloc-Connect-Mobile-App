@@ -25,12 +25,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
 
-      - name: Install dependencies
-        run: npm install
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Audit dependencies for high-severity issues
+        run: npm audit --audit-level=high
 
       - name: Build production bundle
         run: npm run build
+
+      - name: Verify release packaging
+        run: npm run check:release
 
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium

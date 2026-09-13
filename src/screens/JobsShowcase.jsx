@@ -19,7 +19,9 @@ function kindOf(job) {
 
 function posted(value) {
   if (!value) return '';
-  const days = Math.max(0, Math.floor((Date.now() - new Date(value).getTime()) / 86400000));
+  const time = new Date(value).getTime();
+  if (!Number.isFinite(time)) return '';
+  const days = Math.max(0, Math.floor((Date.now() - time) / 86400000));
   if (!days) return 'Posted today';
   return `Posted ${days} day${days === 1 ? '' : 's'} ago`;
 }
@@ -51,7 +53,7 @@ export default function JobsShowcase({ user, requireAccount, navigate }) {
   }, []);
 
   useEffect(() => { load(); }, [load]);
-  useEffect(() => { user ? getSavedJobs(user.id).then(setSaved).catch(() => setSaved([])) : setSaved([]); }, [user]);
+  useEffect(() => { user ? getSavedJobs(user.id).then(setSaved).catch(() => setSaved([])) : setSaved([]); }, [user?.id]);
 
   const providerMap = useMemo(() => new Map(state.providers.map((item) => [item.id, item])), [state.providers]);
   const visible = useMemo(() => {
@@ -61,7 +63,7 @@ export default function JobsShowcase({ user, requireAccount, navigate }) {
       const locationText = `${job.location || ''} ${job.work_setup || ''}`.toLowerCase();
       const categoryOk = category === 'All' || kindOf(job) === category;
       const locationOk = !location || (location === 'Masinloc' ? locationText.includes('masinloc') : location === 'Remote' ? /remote|online|wfh/.test(locationText) : !locationText.includes('masinloc') && !/remote|online|wfh/.test(locationText));
-      const typeOk = !workType || (job.employment_type || '').toLowerCase().replace(' ', '-').includes(workType.toLowerCase());
+      const typeOk = !workType || (job.employment_type || '').toLowerCase().replaceAll(' ', '-').includes(workType.toLowerCase());
       return categoryOk && locationOk && typeOk && (!needle || text.includes(needle));
     });
   }, [state.jobs, query, category, location, workType]);
@@ -74,6 +76,7 @@ export default function JobsShowcase({ user, requireAccount, navigate }) {
   };
 
   const openOpportunity = (job) => {
+    if (!job.apply_url) return;
     trackOpenedLocally(job);
     if (user?.id) recordApplicationHandoff(user.id, job).catch(() => {});
     window.open(job.apply_url, '_blank', 'noopener,noreferrer');
@@ -85,7 +88,7 @@ export default function JobsShowcase({ user, requireAccount, navigate }) {
       <div className="showcase-hero-fade" aria-hidden="true" />
       <div className="showcase-hero-top">
         <button className="showcase-back" type="button" onClick={() => navigate('home')} aria-label="Back"><ArrowLeft size={22} /></button>
-        <img className="showcase-logo" src="/assets/masinloc-connect-logo.webp" alt="Masinloc Connect" />
+        <img className="showcase-logo" src="/assets/masinloc-connect-brand.svg" alt="Masinloc Connect" />
       </div>
       <div className="showcase-script jobs-script">Masinloqueños can go further.<span /></div>
       <div className="jobs-hero-copy"><p className="jobs-kicker">SKILLED PEOPLE. STRONGER MASINLOC.</p><h1>Jobs &amp; Opportunities</h1><p>Find work, scholarships and verified opportunities.</p></div>
@@ -94,7 +97,7 @@ export default function JobsShowcase({ user, requireAccount, navigate }) {
     <section className="showcase-content jobs-content">
       <div className="jobs-search-row">
         <label className="showcase-search"><Search size={21} /><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search jobs, companies, skills…" /></label>
-        <button className={`jobs-filter-button${filtersOpen ? ' active' : ''}`} type="button" onClick={() => setFiltersOpen(!filtersOpen)} aria-label="Filters"><SlidersHorizontal size={20} /></button>
+        <button className={`jobs-filter-button${filtersOpen ? ' active' : ''}`} type="button" onClick={() => setFiltersOpen(!filtersOpen)} aria-label="Filters" aria-expanded={filtersOpen}><SlidersHorizontal size={20} /></button>
       </div>
       <div className="showcase-chip-row">{categories.map((item) => <button key={item} type="button" className={category === item ? 'active' : ''} onClick={() => setCategory(item)}>{item}</button>)}</div>
       <div className={`jobs-filter-panel${filtersOpen ? ' open' : ''}`}>
@@ -114,11 +117,11 @@ export default function JobsShowcase({ user, requireAccount, navigate }) {
         const provider = providerMap.get(job.provider_id);
         const savedJob = isSaved(job.id);
         return <article className="showcase-job-card" key={job.id}>
-          <div className="showcase-job-head"><span className="job-company-mark">{(job.company || 'MC').split(/\s+/).slice(0, 2).map((word) => word[0]).join('').toUpperCase()}</span><div className="showcase-job-title"><h3>{job.title}</h3><p>{job.company}</p></div><button className={`showcase-save${savedJob ? ' saved' : ''}`} type="button" onClick={() => save(job.id)} aria-label="Save"><Heart size={20} fill={savedJob ? 'currentColor' : 'none'} /></button></div>
+          <div className="showcase-job-head"><span className="job-company-mark">{(job.company || 'MC').split(/\s+/).slice(0, 2).map((word) => word[0]).join('').toUpperCase()}</span><div className="showcase-job-title"><h3>{job.title}</h3><p>{job.company}</p></div><button className={`showcase-save${savedJob ? ' saved' : ''}`} type="button" onClick={() => save(job.id)} aria-label={`${savedJob ? 'Remove saved' : 'Save'} ${job.title}`}><Heart size={20} fill={savedJob ? 'currentColor' : 'none'} /></button></div>
           <div className="showcase-job-meta">{job.location ? <span><MapPin size={14} />{job.location}</span> : null}{job.employment_type ? <span><BriefcaseBusiness size={14} />{job.employment_type}</span> : null}</div>
           {job.salary_text ? <p className="showcase-job-pay">{job.salary_text}</p> : null}
           <div className="showcase-job-dates">{job.published_at ? <span>{posted(job.published_at)}</span> : null}{job.closing_date ? <span>Apply by {new Date(job.closing_date).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' })}</span> : null}</div>
-          <div className="showcase-job-footer"><small><Check size={13} />{provider?.attribution_label || provider?.name || 'Trusted Job Provider'}</small><button type="button" onClick={() => openOpportunity(job)}>{kindOf(job) === 'Jobs' ? 'View Job' : 'View Details'} <ExternalLink size={14} /></button></div>
+          <div className="showcase-job-footer"><small><Check size={13} />{provider?.attribution_label || provider?.name || 'Verified opportunity'}</small>{job.apply_url ? <button type="button" onClick={() => openOpportunity(job)}>{kindOf(job) === 'Jobs' ? 'View Job' : 'View Details'} <ExternalLink size={14} /></button> : <span>Application link unavailable</span>}</div>
         </article>;
       })}</div> : <EmptyState icon={Search} title="No matching opportunities" body="Try another keyword or clear a filter." /> : null}
     </section>

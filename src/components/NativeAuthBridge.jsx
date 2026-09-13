@@ -8,7 +8,7 @@ function reportAuthError(error) {
   window.dispatchEvent(new CustomEvent('masinloc-auth-error', { detail: { message } }));
 }
 
-export default function NativeAuthBridge() {
+export default function NativeAuthBridge({ onBack }) {
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return undefined;
     let listenerHandle = null;
@@ -39,6 +39,27 @@ export default function NativeAuthBridge() {
       listenerHandle?.remove();
     };
   }, []);
+
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform() || !onBack) return undefined;
+    let listenerHandle = null;
+    let disposed = false;
+
+    CapacitorApp.addListener('backButton', () => {
+      const handled = onBack();
+      if (!handled) CapacitorApp.exitApp();
+    })
+      .then((handle) => {
+        if (disposed) handle.remove();
+        else listenerHandle = handle;
+      })
+      .catch(() => {});
+
+    return () => {
+      disposed = true;
+      listenerHandle?.remove();
+    };
+  }, [onBack]);
 
   return null;
 }

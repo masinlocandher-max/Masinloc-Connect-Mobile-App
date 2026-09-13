@@ -17,6 +17,7 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
 });
 
 const RAW_DATA_BASE = 'https://raw.githubusercontent.com/masinlocandher-max/Masinloc-Website/main/data';
+const CANONICAL_CACHE = 'masinloc-connect-canonical-v1';
 const DATA_FILES = {
   marketplace: 'marketplace.json',
   marketplaceLogos: 'marketplace-logos.json',
@@ -26,23 +27,56 @@ const DATA_FILES = {
   bulletin: 'bulletin.json',
 };
 
+async function cacheCanonicalResponse(url, response) {
+  if (!globalThis.caches || !response?.ok) return;
+  try {
+    const cache = await globalThis.caches.open(CANONICAL_CACHE);
+    await cache.put(url, response.clone());
+  } catch {
+    // Cache support varies across embedded web views. Network success still wins.
+  }
+}
+
+async function readCachedJson(url) {
+  if (!globalThis.caches) return null;
+  try {
+    const cached = await globalThis.caches.match(url);
+    return cached ? await cached.json() : null;
+  } catch {
+    return null;
+  }
+}
+
 async function fetchJson(url, signal) {
   const response = await fetch(url, { signal, cache: 'no-store' });
   if (!response.ok) throw new Error(`Request failed (${response.status})`);
-  return response.json();
+  const data = await response.clone().json();
+  void cacheCanonicalResponse(url, response);
+  return data;
 }
 
 export async function loadCanonicalData(key, signal) {
   const file = DATA_FILES[key];
   if (!file) throw new Error(`Unknown canonical data source: ${key}`);
+
+  const websiteUrl = `${WEBSITE_BASE}/data/${file}`;
+  const rawUrl = `${RAW_DATA_BASE}/${file}`;
+  let websiteError;
+
   try {
-    return await fetchJson(`${WEBSITE_BASE}/data/${file}`, signal);
-  } catch (websiteError) {
-    try {
-      return await fetchJson(`${RAW_DATA_BASE}/${file}`, signal);
-    } catch {
-      throw websiteError;
-    }
+    return await fetchJson(websiteUrl, signal);
+  } catch (error) {
+    websiteError = error;
+  }
+
+  try {
+    return await fetchJson(rawUrl, signal);
+  } catch {
+    const cachedWebsite = await readCachedJson(websiteUrl);
+    if (cachedWebsite) return cachedWebsite;
+    const cachedRaw = await readCachedJson(rawUrl);
+    if (cachedRaw) return cachedRaw;
+    throw websiteError;
   }
 }
 
@@ -81,8 +115,13 @@ export async function sendEmailSignIn(email) {
 }
 
 export async function handleNativeAuthCallback(url) {
-  if (!url || !url.startsWith(NATIVE_AUTH_REDIRECT)) return false;
+  if (!url) return false;
   const parsed = new URL(url);
+  const expected = new URL(NATIVE_AUTH_REDIRECT);
+  const matchesRedirect = parsed.protocol === expected.protocol
+    && parsed.hostname === expected.hostname
+    && parsed.pathname === expected.pathname;
+  if (!matchesRedirect) return false;
   const callbackError = parsed.searchParams.get('error_description') || parsed.searchParams.get('error');
   if (callbackError) throw new Error(callbackError);
   const code = parsed.searchParams.get('code');

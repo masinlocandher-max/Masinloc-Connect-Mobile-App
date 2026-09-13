@@ -5,11 +5,11 @@ const groups = [
   { title:'Contribute to Masinloc', items:[
     ['submit-history','Submit Masinloc History','Share a local story, record or source.',History],
     ['submit-word','Submit a Sambal Tina Word','Contribute a word for source checking.',BookOpen],
-    ['my-submissions','My Submissions','Review contributions saved on this device.',ClipboardList],
+    ['my-submissions','My Submissions','Review contributions sent from this device.',ClipboardList],
     ['suggest-correction','Suggest a Correction / Update','Flag information that needs review.',Lightbulb],
   ]},
   { title:'Business & community', items:[
-    ['sellers','For Business Owners','Submit or manage a business listing for Marketplace review.',Store],
+    ['sellers','For Business Owners','Submit or update a business listing for Marketplace review.',Store],
     ['about','About Masinloc Connect','Learn how the app and public website work together.',UsersRound],
   ]},
 ];
