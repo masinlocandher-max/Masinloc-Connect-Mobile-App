@@ -1,7 +1,7 @@
 import {
-  Bell, BellRing, BookOpen, Box, BriefcaseBusiness, Building2, CircleUserRound,
+  Bell, BellRing, BookOpen, BriefcaseBusiness, Building2, CircleUserRound,
   Compass, HelpCircle, Home, Info, Mail, MapPin, Settings, Shield,
-  ShoppingCart, Store, Truck, UserRound, Bookmark,
+  ShoppingCart, Store, UserRound, Bookmark,
 } from 'lucide-react';
 
 export const bottomNav = [
@@ -16,9 +16,8 @@ export const mainMenuItems = [
   { id: 'home', label: 'Home', icon: Home, tone: 'blue' },
   { id: 'bulletin', label: 'Community Bulletin', icon: BellRing, tone: 'violet' },
   { id: 'marketplace', label: 'Marketplace', icon: ShoppingCart, tone: 'red' },
-  { id: 'orders', label: 'My Orders', icon: Box, tone: 'cyan' },
   { id: 'jobs', label: 'Jobs & Opportunities', icon: BriefcaseBusiness, tone: 'green' },
-  { id: 'sellers', label: 'For Sellers', icon: Store, tone: 'gold' },
+  { id: 'sellers', label: 'For Business Owners', icon: Store, tone: 'gold' },
   { id: 'discover', label: 'Discover Masinloc', icon: MapPin, tone: 'purple' },
   { id: 'profile', label: 'Profile / Account', icon: UserRound, tone: 'royal' },
   { id: 'dictionary', label: 'Sambal Tina', icon: BookOpen, tone: 'orange' },
@@ -34,10 +33,8 @@ export const moreItems = [
   { id: 'dictionary', label: 'Sambal Tina', icon: BookOpen, tone: 'orange' },
   { id: 'history', label: 'Masinloc History', icon: Building2, tone: 'teal' },
   { id: 'bulletin', label: 'Community Bulletin', icon: BellRing, tone: 'violet' },
-  { id: 'sellers', label: 'For Sellers', icon: Store, tone: 'gold' },
+  { id: 'sellers', label: 'For Business Owners', icon: Store, tone: 'gold' },
   { id: 'profile', label: 'Account Settings', icon: CircleUserRound, tone: 'royal' },
-  { id: 'orders', label: 'My Orders', icon: ShoppingCart, tone: 'red' },
-  { id: 'tracking', label: 'Order Status / Tracking', icon: Truck, tone: 'cyan' },
   { id: 'about', label: 'About Masinloc Connect', icon: Info, tone: 'lavender' },
   { id: 'policies', label: 'Privacy, Terms & Policies', icon: Settings, tone: 'slate' },
 ];
