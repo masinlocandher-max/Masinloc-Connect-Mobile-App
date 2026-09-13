@@ -29,6 +29,9 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Audit dependencies for high-severity issues
+        run: npm audit --audit-level=high
+
       - name: Build production bundle
         run: npm run build
 
